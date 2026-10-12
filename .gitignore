@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Para ignorar nosso .env.local
+.env
+.env.*
+!.env.example

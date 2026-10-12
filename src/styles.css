@@ -1,0 +1,167 @@
+@import "tailwindcss" source(none);
+@import "tw-animate-css";
+@source "../src";
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Nunito", sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  --color-popover: var(--card);
+  --color-popover-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--secondary);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--secondary);
+  --color-accent-foreground: var(--foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--card);
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--primary);
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+}
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.225 0.071 263);
+  --card: oklch(1 0 0);
+  --primary: oklch(0.687 0.105 178);
+  --primary-hover: oklch(0.62 0.105 178);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.965 0.01 178);
+  --muted-foreground: oklch(0.53 0 0);
+  --border: oklch(0.56 0 0);
+  --destructive: oklch(0.51 0.19 25);
+  --navy: oklch(0.225 0.071 263);
+  --on-navy: oklch(1 0 0);
+  --on-navy-muted: oklch(0.88 0.02 263);
+  --error-on-navy: oklch(0.85 0.1 25);
+  --progress-inactive: oklch(0.85 0 0);
+  --brand-corner: linear-gradient(160deg, var(--primary), transparent 85%);
+}
+@layer base {
+  * { box-sizing: border-box; border-color: var(--border); }
+  body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); letter-spacing: 0; }
+  input, button { font: inherit; }
+  h1, h2, p { margin: 0; }
+}
+.study-button { background: var(--primary); color: var(--primary-foreground); border-radius: 13px; font-weight: 900; font-size: 13px; box-shadow: none; }
+.study-button:hover { background: var(--primary-hover); }
+.study-icon-button { background: transparent; color: var(--foreground); border-radius: 6px; box-shadow: none; }
+.study-icon-button:hover { background: var(--secondary); }
+.study-icon-button svg { width: 22px; height: 22px; }
+.auth-page { min-height: 100svh; }
+.login-page { display: grid; grid-template-columns: 46% minmax(0, 1fr); }
+.login-brand-header { background: var(--navy); color: var(--on-navy); min-height: 100svh; display: grid; place-items: center; position: relative; overflow: hidden; }
+.login-brand-header::before { content: ""; position: absolute; width: 210px; height: 210px; border-radius: 50%; top: -90px; right: -50px; background: var(--brand-corner); }
+.login-brand-header::after { content: ""; position: absolute; width: 170px; height: 170px; border-radius: 50%; bottom: 100px; left: -95px; background: var(--primary); }
+.study-brand { display: flex; align-items: center; flex-direction: column; position: relative; }
+.study-logo { display: block; width: 154px; height: auto; margin-bottom: 8px; }
+.logo-teal { fill: var(--primary); }
+.logo-navy { fill: var(--navy); }
+.logo-white { fill: var(--card); }
+.logo-smile { fill: none; stroke: var(--card); stroke-width: 5; stroke-linecap: round; }
+.study-wordmark { font-size: 44px; font-weight: 900; line-height: 1.2; }
+.study-wordmark span { color: var(--primary); }
+.study-tagline { font-size: 13px; margin-top: 6px; color: var(--on-navy); }
+.login-content { display: flex; justify-content: center; align-items: center; padding: 60px 36px; background: var(--background); }
+.login-content-inner { width: 100%; max-width: 390px; }
+.login-content h1, .signup-body h1 { font-size: 25px; font-weight: 900; line-height: 1.3; }
+.login-content h1 span { color: var(--primary); }
+.auth-subtitle { font-size: 15px; line-height: 1.5; margin-top: 3px; }
+.login-form { background: var(--navy); color: var(--on-navy); border-radius: 14px; padding: 21px 22px 28px; margin-top: 26px; }
+.login-form h2 { font-size: 25px; font-weight: 900; text-align: center; margin-bottom: 24px; }
+.login-fields { display: grid; gap: 18px; }
+.study-input-wrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; background: var(--card); color: var(--foreground); border-radius: 14px; min-height: 48px; border: 2px solid var(--border); position: relative; }
+.study-input-wrap:focus-within { border-color: var(--primary); outline: 3px solid var(--secondary); }
+.study-input-wrap input { border: 0; outline: none; min-width: 0; width: 100%; height: 44px; background: transparent; color: var(--foreground); font-size: 12px; padding: 0 13px; border-radius: inherit; }
+.study-input-wrap input::placeholder { color: var(--muted-foreground); opacity: 1; }
+.study-field-signup .study-input-wrap:has(.field-leading-icon) { grid-template-columns: 30px minmax(0, 1fr) auto; padding-left: 10px; }
+.field-leading-icon { width: 21px; height: 21px; color: var(--primary); }
+.study-field-signup .study-input-wrap input { padding-left: 2px; }
+.password-toggle { margin-right: 4px; width: 32px; height: 32px; color: var(--muted-foreground); }
+.study-field-login .study-input-wrap { border: 2px solid transparent; min-height: 38px; border-radius: 14px; }
+.study-field-login .study-input-wrap input { height: 34px; font-size: 12px; }
+.study-field-login .password-toggle { height: 28px; }
+.study-field-login .password-toggle svg { width: 17px; height: 17px; }
+.study-input-wrap.has-error { border-color: var(--destructive); }
+.field-error { color: var(--destructive); font-size: 12px; line-height: 1.4; margin-top: 5px; }
+.login-form .field-error { color: var(--error-on-navy); }
+.form-status { color: var(--foreground); font-size: 13px; line-height: 1.5; margin-top: 15px; text-align: center; }
+.login-form .form-status { color: var(--on-navy-muted); }
+.login-footer { margin-top: 68px; text-align: center; }
+.login-footer p { font-size: 15px; margin-bottom: 9px; }
+.signup-page { display: flex; justify-content: center; }
+.signup-content { width: 100%; max-width: 440px; padding: 38px 32px 36px; display: flex; flex-direction: column; min-height: 100svh; }
+.signup-navigation { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; align-items: center; margin-left: -12px; margin-right: -12px; }
+.signup-progress { display: flex; justify-content: center; padding: 0; list-style: none; margin: 0; }
+.signup-progress li { width: 13px; height: 13px; background: var(--progress-inactive); border: 1px solid var(--card); border-radius: 50%; position: relative; margin: 0 15px; }
+.signup-progress li:not(:last-child)::after { content: ""; position: absolute; height: 2px; width: 27px; background: var(--progress-inactive); left: 14px; top: 5px; }
+.signup-progress li.current { background: var(--primary); }
+.study-brand-compact { flex-direction: row; justify-content: center; gap: 10px; margin-top: 36px; }
+.study-brand-compact .study-logo { width: 49px; height: auto; margin: 0; }
+.study-brand-compact .study-wordmark { font-size: 25px; }
+.signup-body { margin-top: 44px; }
+.signup-form { margin-top: 48px; }
+.signup-fields { display: grid; gap: 23px; }
+.signup-form > .study-button { margin-top: 45px; }
+.signup-footer { margin-top: auto; padding-top: 80px; text-align: center; }
+.terms-label { color: var(--muted-foreground); text-decoration: underline; font-size: 12px; }
+@media (max-width: 700px) {
+  .login-page { display: flex; flex-direction: column; background: var(--navy); }
+  .login-brand-header { min-height: 0; height: 330px; flex-shrink: 0; padding-bottom: 16px; }
+  .login-brand-header::before { width: 150px; height: 150px; top: -54px; right: -65px; }
+  .login-brand-header::after { width: 105px; height: 105px; bottom: -25px; left: -34px; }
+  .study-logo { width: 123px; height: auto; }
+  .study-wordmark { font-size: 36px; }
+  .study-tagline { font-size: 11px; margin-top: 2px; }
+  .login-content { padding: 30px 38px 24px; border-radius: 16px 16px 0 0; margin-top: -1px; flex: 1; align-items: stretch; }
+  .login-content-inner { display: flex; flex-direction: column; }
+  .login-content h1, .signup-body h1 { font-size: 23px; }
+  .auth-subtitle { font-size: 14px; }
+  .login-form { margin-top: 20px; padding: 17px 19px 30px; }
+  .login-form h2 { font-size: 24px; margin-bottom: 19px; }
+  .login-fields { gap: 16px; }
+  .login-fields .study-button { height: 34px; }
+  .login-footer { margin-top: auto; padding-top: 65px; }
+  .login-footer .study-button { height: 39px; }
+  .signup-content { padding: 43px 24px 36px; max-width: 410px; }
+  .signup-navigation { margin-left: -9px; margin-right: -9px; }
+  .study-brand-compact { margin-top: 26px; }
+  .study-brand-compact .study-logo { width: 47px; height: auto; }
+  .study-brand-compact .study-wordmark { font-size: 24px; }
+  .signup-body { margin-top: 39px; }
+  .signup-form { margin-top: 45px; }
+  .signup-fields { gap: 22px; }
+  .study-field-signup .study-input-wrap { min-height: 47px; }
+  .signup-form > .study-button { margin-top: 43px; height: 40px; }
+}
+@media (max-width: 360px) {
+  .login-content { padding-left: 28px; padding-right: 28px; }
+  .study-brand-compact .study-wordmark { font-size: 22px; }
+  .auth-subtitle { font-size: 13px; }
+}
+/* Tablets e telas médias: coluna da marca mais estreita, logo ajustada */
+@media (min-width: 701px) and (max-width: 940px) {
+  .login-page { grid-template-columns: 42% minmax(0, 1fr); }
+  .study-logo { width: 118px; height: auto; }
+  .study-wordmark { font-size: 36px; }
+  .login-content { padding: 48px 28px; }
+}
+/* Telas grandes: marca e conteúdo levemente ampliados */
+@media (min-width: 1600px) {
+  .study-logo { width: 178px; height: auto; }
+  .study-wordmark { font-size: 54px; }
+  .login-content-inner { max-width: 420px; }
+  .signup-content { max-width: 480px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
