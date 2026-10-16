@@ -1,23 +1,39 @@
 # Studyholics
 
-Site estático feito com HTML, CSS e JavaScript, usando Vite para desenvolvimento local e geração dos arquivos de publicação.
+Site para acompanhamento de estudos.
 
-## Desenvolvimento
+Feito com HTML, CSS e JavaScript, usando Vite para desenvolvimento local e geração dos arquivos de publicação.
+
+## Dependências para rodar localmente:
 
 Requer Node.js 20.19 ou superior e npm.
 
+- Windows
 ```sh
+winget install OpenJS.NodeJS.LTS 
 npm install
 npm run dev
 ```
+- Linux
+```sh
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+npm install --lts
+npm run dev
+```
 
-Abra o endereço local exibido pelo Vite no terminal.
+### Verificar a instalação:
+
+```sh
+node -v
+npm -v
+```
 
 ## Build de produção
 
 ```sh
 npm run build
 npm run preview
+npm run dev
 ```
 
 O Vite gera o site pronto para hospedagem estática na pasta `dist/`.
@@ -28,10 +44,11 @@ O Vite gera o site pronto para hospedagem estática na pasta `dist/`.
 - `public/`: imagens, favicon e `robots.txt`, copiados sem alteração para o build.
 - `package.json` e `package-lock.json`: scripts e dependências de desenvolvimento.
 
-O cliente Supabase está disponível como dependência, mas as telas de login e cadastro atuais ainda são apenas interface: o formulário não cria contas, não autentica usuários e não envia dados ao Supabase.
 
-## Publicação na Vercel
+## Próximos Passos:
 
-Importe o repositório GitHub na Vercel, mantenha a raiz do projeto como diretório raiz e use o preset Vite. Configure o comando de build como `npm run build` e a pasta de saída como `dist`. Depois, cada push para a branch conectada inicia uma nova publicação.
+- [ ] Conectar com o banco de dados e estruturar o back-end
+- [ ] Criar um perfil de teste para validar funções de cadastro
+- [ ] Criar a funcionalidade do Pomodoro
+- [ ] Criar a funcionalidade de Gerenciamento de Perfil
 
-Se o site passar a chamar o Supabase, configure as variáveis necessárias em **Project Settings → Environment Variables** na Vercel e mantenha as chaves privadas fora do JavaScript público.
