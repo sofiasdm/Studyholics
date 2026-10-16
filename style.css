@@ -29,6 +29,9 @@ h1 span { color: var(--teal); }
 .icon-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .status { font-size: 13px; text-align: center; margin-top: 14px; }
 .error { color: var(--error); font-size: 12px; margin-top: 5px; }
+.status[data-type="error"] { color: var(--error); }
+.login-card .status[data-type="error"] { color: var(--error-light); }
+.btn:disabled { opacity: .6; cursor: wait; }
 
 /* Campos */
 .field { position: relative; display: flex; align-items: center; background: #fff; border: 2px solid var(--border); border-radius: 14px; min-height: 48px; padding: 0 12px; transition: border-color .2s; }
