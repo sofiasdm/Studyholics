@@ -1,0 +1,9 @@
+Studyholics
+
+Como abrir: de dois cliques no arquivo index.html para abri-lo no navegador.
+
+Arquivos:
+- index.html: telas
+- style.css: visual
+- app.js: navegacao e validacao
+- imagens: logo e icone
