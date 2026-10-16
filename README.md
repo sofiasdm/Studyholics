@@ -1,32 +1,37 @@
-# React + TypeScript + Vite
+# Studyholics
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Site estático feito com HTML, CSS e JavaScript, usando Vite para desenvolvimento local e geração dos arquivos de publicação.
 
-Currently, two official plugins are available:
+## Desenvolvimento
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Requer Node.js 20.19 ou superior e npm.
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```sh
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Abra o endereço local exibido pelo Vite no terminal.
+
+## Build de produção
+
+```sh
+npm run build
+npm run preview
+```
+
+O Vite gera o site pronto para hospedagem estática na pasta `dist/`.
+
+## Estrutura
+
+- `index.html`, `style.css`, `app.js`: site e interações do navegador.
+- `public/`: imagens, favicon e `robots.txt`, copiados sem alteração para o build.
+- `package.json` e `package-lock.json`: scripts e dependências de desenvolvimento.
+
+O cliente Supabase está disponível como dependência, mas as telas de login e cadastro atuais ainda são apenas interface: o formulário não cria contas, não autentica usuários e não envia dados ao Supabase.
+
+## Publicação na Vercel
+
+Importe o repositório GitHub na Vercel, mantenha a raiz do projeto como diretório raiz e use o preset Vite. Configure o comando de build como `npm run build` e a pasta de saída como `dist`. Depois, cada push para a branch conectada inicia uma nova publicação.
+
+Se o site passar a chamar o Supabase, configure as variáveis necessárias em **Project Settings → Environment Variables** na Vercel e mantenha as chaves privadas fora do JavaScript público.
