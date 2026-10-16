@@ -24,10 +24,10 @@
         <p class="subtitle">Faça login para continuar sua jornada.</p>
         <form class="login-card" novalidate>
           <h2>Login</h2>
-          <div class="field"><input name="username" placeholder="Nome de usuário" autocomplete="username" required /></div>
+          <div class="field"><input name="email" type="email" placeholder="E-mail" autocomplete="email" required /></div>
           <div class="field password"><input name="password" type="password" placeholder="Senha" autocomplete="current-password" required /></div>
           <button class="btn" type="submit">Entrar</button>
-          <p class="status" hidden>Dados validados. O acesso à conta estará disponível na próxima etapa.</p>
+          <p class="status" hidden></p>
         </form>
         <footer class="login-footer">
           <p>Ainda não tem uma conta?</p>
@@ -71,16 +71,14 @@
         <div class="fields">
           <label class="field select icon cap"><span>Curso</span>
             <select name="course" required>
-              <option value="">Selecione seu curso</option>
-              <option>Ciência da Computação</option><option>Engenharia</option><option>Direito</option>
-              <option>Medicina</option><option>Administração</option><option>Outro</option>
+              <option value="">Carregando cursos…</option>
             </select>
           </label>
           <label class="field select icon calendar"><span>Semestre atual</span>
             <select name="semester" required>
               <option value="">Selecione seu semestre</option>
-              <option>1º</option><option>2º</option><option>3º</option><option>4º</option><option>5º</option>
-              <option>6º</option><option>7º</option><option>8º</option><option>9º</option><option>10º</option>
+              <option value="1">1º</option><option value="2">2º</option><option value="3">3º</option><option value="4">4º</option><option value="5">5º</option>
+              <option value="6">6º</option><option value="7">7º</option><option value="8">8º</option><option value="9">9º</option><option value="10">10º</option>
             </select>
           </label>
         </div>
@@ -98,10 +96,10 @@
           <b>+</b>
         </label>
         <label class="field select icon user"><span>Nome de usuário</span>
-          <input name="username" placeholder="Ex: felipe123" required minlength="3" />
+          <input name="username" placeholder="Ex: felipe123" required minlength="3" maxlength="30" autocomplete="username" />
         </label>
         <button class="btn" type="submit">Finalizar</button>
-        <p class="status" hidden>Dados validados. Nenhuma conta foi criada nesta etapa.</p>
+        <p class="status" hidden></p>
       </form>
     </div>
   </main>
