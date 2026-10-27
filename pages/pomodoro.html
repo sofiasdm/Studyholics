@@ -3,141 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studyholics - Modo Foco</title>
+    <title>Studyholics - Pomodoro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     
-    <!-- Liga ao vosso CSS principal para manter a mesma base -->
-    <link rel="stylesheet" href="../css/global.css">
-    <!-- Adicionamos alguns estilos específicos para o Pomodoro -->
-    <style>
-        /* Fundo azul escuro inspirado no vosso Figma */
-        body {
-            background-color: #1a365d; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: white;
-            font-family: sans-serif;
-        }
-
-        .pomodoro-container {
-            background-color: white;
-            color: #1a365d; /* Texto em azul escuro */
-            padding: 40px;
-            border-radius: 12px;
-            text-align: center;
-            width: 90%;
-            max-width: 450px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        /* O vosso logótipo no topo do painel */
-        .pomodoro-logo {
-            width: 80px;
-            margin-bottom: 20px;
-        }
-
-        .pomodoro-title {
-            margin-bottom: 5px;
-            font-size: 24px;
-        }
-
-        /* Destaque para a palavra "Foco" com a cor verde água da marca */
-        .highlight {
-            color: #48bb78; 
-        }
-
-        .pomodoro-subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-
-        #timer-display {
-            font-size: 80px;
-            font-weight: bold;
-            margin: 20px 0;
-            letter-spacing: 2px;
-        }
-
-        .controls {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        /* Botão verde água */
-        .btn-start {
-            background-color: #48bb78;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            flex: 1; /* Para os botões terem a mesma largura */
-        }
-
-        /* Botão vazado azul escuro */
-        .btn-pause {
-            background-color: transparent;
-            color: #1a365d;
-            border: 2px solid #1a365d;
-            padding: 10px 25px; /* Ligeiramente menor no padding por causa da borda */
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            flex: 1;
-        }
-
-        .btn-reset {
-            background: none;
-            border: none;
-            color: #888;
-            text-decoration: underline;
-            cursor: pointer;
-            font-size: 14px;
-        }
-    </style>
+    <!-- Link limpo para o novo ficheiro CSS -->
+    <link rel="stylesheet" href="../css/pomodoro.css">
 </head>
 <body>
 
     <div class="pomodoro-container">
-        <!-- Substituí o src pelo caminho correto para a vossa imagem -->
-        <img src="../studyholics-mark.png" alt="Símbolo Studyholics" class="pomodoro-logo">
-        
-        <h1 class="pomodoro-title">Modo <span class="highlight">Foco</span></h1>
-        <p class="pomodoro-subtitle">Estude. Evolua. Compartilhe.</p>
-        
-        <div id="timer-display">25:00</div>
-        
-        <div class="controls">
-            <button id="btn-iniciar" class="btn-start">Iniciar</button>
-            <button id="btn-pausar" class="btn-pause">Pausar</button>
+        <!-- TELA 1: Configurações -->
+        <div id="tela-configuracao">
+            <h2 class="titulo">Nova sessão</h2>
+            <p class="subtitulo">Defina o que você vai estudar e por quanto tempo.</p>
+            
+            <div class="cards-topo">
+                <div class="card-falso">
+                    <div class="icone"></div>
+                    <div class="textos">
+                        <label>Disciplina</label>
+                        <strong>Programação Python</strong>
+                    </div>
+                </div>
+                <div class="card-falso">
+                    <div class="icone"></div>
+                    <div class="textos">
+                        <label>Conteúdo</label>
+                        <strong>Estrutura de repetição</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-tempos">
+                <div class="input-box">
+                    <label>Pomodoro</label>
+                    <input type="number" id="input-foco" value="25" min="1">
+                </div>
+                <div class="input-box">
+                    <label>Pausa curta</label>
+                    <input type="number" id="input-pausa-curta" value="5" min="1">
+                </div>
+                <div class="input-box">
+                    <label>Pausa longa</label>
+                    <input type="number" id="input-pausa-longa" value="10" min="1">
+                </div>
+                <div class="input-box">
+                    <label>Intervalo longa</label>
+                    <input type="number" id="input-intervalo" value="4" min="1">
+                </div>
+            </div>
         </div>
-        
-        <button id="btn-zerar" class="btn-reset">Zerar Ciclo</button>
+
+        <!-- TELA 2: Andamento -->
+        <div id="tela-andamento" style="display: none; text-align: center;">
+            <h2 class="titulo">Sessão em andamento</h2>
+            <p class="subtitulo">Mantenha o foco! Você consegue!</p>
+            <h3 id="contador-sessao" style="font-size: 24px; margin-bottom: 5px;">Sessão: 1</h3>
+            
+            <!-- Botão de Voltar -->
+            <button id="btn-voltar" class="btn-texto">← Voltar para configurações</button>
+        </div>
+
+        <div class="area-relogio">
+            <div class="circulo-timer">
+                <div id="timer-display">25:00</div>
+            </div>
+            <button id="btn-acao" class="btn-verde">▶ Começar</button>
+        </div>
     </div>
 
-    <!-- O "cérebro" do Pomodoro -->
     <script src="../js/pomodoro.js"></script>
-    
-    <!-- A "cola" entre o HTML e a lógica do pomodoro.js -->
     <script>
-        const relogioDisplay = document.getElementById('timer-display');
-        
-        // Criamos o objeto passando as funções de atualizar a tela e mostrar alerta
-        const meuPomodoro = new PomodoroTimer(
-            (tempoFormatado) => relogioDisplay.textContent = tempoFormatado,
-            (mensagem) => alert(mensagem)
+        const display = document.getElementById('timer-display');
+        const btnAcao = document.getElementById('btn-acao');
+        const btnVoltar = document.getElementById('btn-voltar');
+        const telaConfig = document.getElementById('tela-configuracao');
+        const telaAndamento = document.getElementById('tela-andamento');
+        const contadorSessao = document.getElementById('contador-sessao');
+
+        let rodando = false;
+
+        const pomodoro = new PomodoroTimer(
+            (tempo) => display.textContent = tempo,
+            (msg) => alert(msg),
+            (sessaoAtual) => contadorSessao.textContent = `Sessão: ${sessaoAtual}`
         );
 
-        // Ligamos os cliques dos botões às ações da classe
-        document.getElementById('btn-iniciar').addEventListener('click', () => meuPomodoro.iniciar());
-        document.getElementById('btn-pausar').addEventListener('click', () => meuPomodoro.pausar());
-        document.getElementById('btn-zerar').addEventListener('click', () => meuPomodoro.zerar());
+        btnAcao.addEventListener('click', () => {
+            if (!rodando) {
+                pomodoro.configurar({
+                    foco: parseInt(document.getElementById('input-foco').value),
+                    pausaCurta: parseInt(document.getElementById('input-pausa-curta').value),
+                    pausaLonga: parseInt(document.getElementById('input-pausa-longa').value),
+                    intervalosPausaLonga: parseInt(document.getElementById('input-intervalo').value)
+                });
+                pomodoro.iniciar();
+                rodando = true;
+                
+                telaConfig.style.display = 'none';
+                telaAndamento.style.display = 'block';
+                btnAcao.innerHTML = '⏸ Pausar';
+                btnAcao.style.backgroundColor = '#6c757d';
+            } else {
+                pomodoro.pausar();
+                rodando = false;
+                btnAcao.innerHTML = '▶ Continuar';
+                btnAcao.style.backgroundColor = '#48bb78';
+            }
+        });
+
+        // Lógica para interromper a sessão e voltar
+        btnVoltar.addEventListener('click', () => {
+            pomodoro.pausar();
+            rodando = false;
+            
+            // Restaura visual do botão principal
+            btnAcao.innerHTML = '▶ Começar';
+            btnAcao.style.backgroundColor = '#48bb78';
+            
+            // Troca as telas
+            telaAndamento.style.display = 'none';
+            telaConfig.style.display = 'block';
+            
+            // Restaura o relógio para o tempo original escolhido
+            const tempoFocoOriginal = document.getElementById('input-foco').value;
+            display.textContent = `${tempoFocoOriginal.padStart(2, '0')}:00`;
+        });
     </script>
 </body>
 </html>

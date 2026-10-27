@@ -126,3 +126,6 @@ h1 span { color: var(--teal); }
   .wordmark { font-size: 52px; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+
+

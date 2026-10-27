@@ -1,0 +1,164 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif;
+}
+
+body {
+    margin: 0;
+    background-color: #f4f8fb;
+    color: #1a365d;
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.pomodoro-container {
+    width: 100%;
+    max-width: 900px;
+}
+
+/* --- CABEÇALHO --- */
+.titulo {
+    font-size: 32px;
+    font-weight: 900;
+    margin: 0 0 5px 0;
+}
+
+.subtitulo {
+    color: #666;
+    margin: 0 0 30px 0;
+    font-size: 15px;
+}
+
+/* --- CARDS DE DISCIPLINA --- */
+.cards-topo {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card-falso {
+    flex: 1;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.card-falso .icone {
+    width: 40px;
+    height: 40px;
+    background-color: #48bb78;
+    border-radius: 8px;
+    opacity: 0.2;
+}
+
+.card-falso .textos label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+}
+
+.card-falso .textos strong {
+    font-size: 16px;
+    color: #1a365d;
+}
+
+/* --- CAMPOS DE TEMPO --- */
+.config-tempos {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 50px;
+}
+
+.input-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-box label {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.input-box input {
+    width: 80px;
+    height: 50px;
+    font-size: 22px;
+    background-color: #0b1c3c;
+    color: white;
+    font-weight: 900;
+    text-align: center;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+}
+
+.input-box input::-webkit-outer-spin-button,
+.input-box input::-webkit-inner-spin-button {
+    opacity: 1;
+}
+
+/* --- ÁREA DO RELÓGIO --- */
+.area-relogio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.circulo-timer {
+    width: 220px;
+    height: 220px;
+    border: 12px solid #48bb78;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 25px rgba(72, 187, 120, 0.1);
+}
+
+#timer-display {
+    font-size: 55px;
+    font-weight: 900;
+    color: #1a365d;
+    letter-spacing: -2px;
+}
+
+/* --- BOTÕES --- */
+.btn-verde {
+    background-color: #48bb78;
+    color: white;
+    padding: 12px 35px;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+    transition: transform 0.1s;
+}
+
+.btn-verde:active {
+    transform: scale(0.95);
+}
+
+.btn-texto {
+    background: none;
+    border: none;
+    color: #666;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+    font-family: 'Nunito', sans-serif;
+}
+
+.btn-texto:hover {
+    color: #1a365d;
+}
