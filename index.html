@@ -37,6 +37,109 @@
     </section>
   </main>
 
+  <!-- ===== TELA: CADASTRO (3 etapas) ===== -->
+  <main class="screen signup" id="signup" data-step="1" hidden>
+    <div class="signup-inner">
+      <nav class="signup-nav" aria-label="Progresso do cadastro">
+        <button class="icon-btn" type="button" id="back" aria-label="Voltar ao passo anterior">
+          <svg viewBox="0 0 24 24"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
+        </button>
+        <ol class="progress" aria-label="Etapas do cadastro"><li></li><li></li><li></li></ol>
+        <span aria-hidden="true"></span>
+      </nav>
+      <div class="brand-compact">
+        <img src="assets/studyholics-mark.png" alt="" />
+        <p class="wordmark">Study<span>holics</span></p>
+      </div>
+
+      <form class="step" data-step="1" novalidate>
+        <h1>Criar conta</h1>
+        <p class="subtitle">Vamos começar com seus dados básicos.</p>
+        <div class="fields">
+          <div class="field icon user"><input name="name" placeholder="Nome completo" autocomplete="name" required minlength="2" /></div>
+          <div class="field icon mail"><input name="email" type="email" placeholder="E-mail" autocomplete="email" required /></div>
+          <div class="field icon lock password"><input name="password" type="password" placeholder="Senha" autocomplete="new-password" aria-describedby="password-guidance" required minlength="8" /></div>
+          <div class="field icon lock password"><input name="confirm" type="password" placeholder="Confirmar senha" autocomplete="new-password" required /></div>
+        </div>
+        <p class="password-guidance" id="password-guidance">Crie uma senha com pelo menos 8 caracteres. Combine letras e números para deixá-la mais segura.</p>
+        <button class="btn" type="submit">Próximo</button>
+        <p class="status" role="status" aria-live="polite" hidden></p>
+        <a class="terms" href="#login" data-route="login">Já tem uma conta? Entrar</a>
+      </form>
+
+      <form class="step" data-step="2" novalidate hidden>
+        <h1>Dados acadêmicos</h1>
+        <p class="subtitle">Conte um pouco sobre seu curso.</p>
+        <div class="fields">
+          <label class="field select icon cap"><span>Curso</span>
+            <select name="course" required><option value="">Carregando cursos…</option></select>
+          </label>
+          <label class="field select icon calendar"><span>Semestre atual</span>
+            <select name="semester" required>
+              <option value="">Selecione seu semestre</option>
+              <option value="1">1º</option><option value="2">2º</option><option value="3">3º</option><option value="4">4º</option><option value="5">5º</option>
+              <option value="6">6º</option><option value="7">7º</option><option value="8">8º</option><option value="9">9º</option><option value="10">10º</option>
+            </select>
+          </label>
+        </div>
+        <button class="btn" type="submit">Próximo</button>
+      </form>
+
+      <form class="step" data-step="3" novalidate hidden>
+        <h1>Quase lá!</h1>
+        <p class="subtitle">Escolha seu nome de usuário e, se quiser, uma foto.</p>
+        <label class="avatar" aria-label="Adicionar foto de perfil">
+          <input type="file" name="photo" accept="image/*" hidden />
+          <svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+          <img alt="Prévia da foto de perfil" hidden />
+          <b aria-hidden="true">+</b>
+        </label>
+        <label class="field select icon user"><span>Nome de usuário</span>
+          <input name="username" placeholder="Ex: felipe123" required minlength="3" maxlength="30" autocomplete="username" />
+        </label>
+        <button class="btn" type="submit">Criar minha conta</button>
+        <p class="status" role="status" aria-live="polite" hidden></p>
+        <a class="terms" href="#login" data-route="login">Voltar para entrar</a>
+      </form>
+    </div>
+  </main>
+
+  <!-- A conta só pode entrar depois de confirmar o código enviado pelo Supabase. -->
+  <main class="screen signup" id="verify-email" hidden>
+    <section class="signup-inner">
+      <div class="brand-compact">
+        <img src="assets/studyholics-mark.png" alt="" />
+        <p class="wordmark">Study<span>holics</span></p>
+      </div>
+      <form id="verification-form" class="step" novalidate>
+        <h1>Confirme seu e-mail</h1>
+        <p class="subtitle">Enviamos um código para <strong id="verification-email"></strong>. Digite-o abaixo para ativar sua conta.</p>
+        <div class="fields">
+          <div class="field"><input name="token" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="Código de confirmação" required /></div>
+          <input name="email" type="hidden" />
+        </div>
+        <button class="btn" type="submit">Confirmar e-mail</button>
+        <button class="secondary-btn" type="button" id="resend-code">Enviar código novamente</button>
+        <p class="status" role="status" aria-live="polite" hidden></p>
+        <a class="terms" href="#login" data-route="login">Voltar para entrar</a>
+      </form>
+    </section>
+  </main>
+
+  <!-- Destino autenticado: confirma que o login foi concluído com sucesso. -->
+  <main class="screen signup" id="welcome" hidden>
+    <section class="signup-inner welcome-card" aria-live="polite">
+      <div class="brand-compact">
+        <img src="assets/studyholics-mark.png" alt="" />
+        <p class="wordmark">Study<span>holics</span></p>
+      </div>
+      <div class="welcome-content">
+        <h1 id="welcome-title">Acesso liberado!</h1>
+        <p class="subtitle">Você entrou no Studyholics. Sua conta está pronta para continuar sua jornada de estudos.</p>
+        <button class="btn" type="button" id="logout">Ir para a tela de login</button>
+      </div>
+    </section>
+  </main>
 
 
   <script type="module" src="js/app.js"></script>
