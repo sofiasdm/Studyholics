@@ -1,8 +1,7 @@
 import { defineConfig } from "vite";
 import { fileURLToPath } from "node:url";
 
-// Converte um caminho relativo (a partir desta pasta) em caminho absoluto
-const pagina = caminho => fileURLToPath(new URL(caminho, import.meta.url));
+const raiz = (caminho) => fileURLToPath(new URL(caminho, import.meta.url));
 
 // O Vite só expõe ao navegador variáveis que começam com VITE_.
 // Como o .env.local do projeto usa NEXT_PUBLIC_, liberamos os dois prefixos.
@@ -10,12 +9,15 @@ export default defineConfig({
   envPrefix: ["VITE_", "NEXT_PUBLIC_"],
   build: {
     rollupOptions: {
-      // No "npm run dev" qualquer página abre. No "npm run build" (o que o Vercel
-      // executa), só entram as páginas listadas aqui. Quando uma página nova ganhar
-      // conteúdo (login, perfil, dashboard...), adicione uma linha para ela.
+      // Cada página HTML precisa estar listada aqui, senão não vai para o build
+      // (e dá 404 no Vercel). Página nova com conteúdo = uma linha nova.
       input: {
-        index: pagina("./index.html"),
-        cadastro: pagina("./pages/cadastro.html"),
+        main: raiz("./index.html"),
+        cadastro: raiz("./pages/cadastro.html"),
+        pomodoro: raiz("./pages/pomodoro.html"),
+        sessao: raiz("./pages/sessao-estudo.html"),
+        conclusao: raiz("./pages/conclusao-sessao.html"),
+        gamificacao: raiz("./pages/gamificacao.html"),
       },
     },
   },

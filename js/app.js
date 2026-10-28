@@ -110,7 +110,7 @@ async function withBusy(form, action) {
     await action();
   } catch (err) {
     console.error(err);
-    setStatus(form, "Algo deu errado. Tente novamente em instantes.", "error");
+    setStatus(form, authMessage(err), "error");
   } finally {
     btn.disabled = false;
     btn.textContent = label;
@@ -119,17 +119,41 @@ async function withBusy(form, action) {
 
 // Traduz os erros do Supabase Auth para mensagens amigáveis
 function authMessage(error) {
-  switch (error.code) {
-    case "invalid_credentials":    return "E-mail ou senha incorretos.";
-    case "email_not_confirmed":    return "Confirme seu e-mail antes de entrar (veja sua caixa de entrada).";
-    case "user_already_exists":
-    case "email_exists":           return "Este e-mail já está cadastrado.";
-    case "weak_password":          return "Senha fraca. Use pelo menos 8 caracteres.";
-    case "over_request_rate_limit":
-    case "over_email_send_rate_limit": return "Muitas tentativas. Aguarde um pouco e tente de novo.";
+  const code = String(error?.code ?? error?.error_code ?? "").toLowerCase();
+  const detail = [error?.message, error?.error_description, error?.details]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  // O Supabase pode sinalizar e-mail repetido por código ou apenas pela mensagem,
+  // dependendo da configuração de confirmação de e-mail do projeto.
+  if (
+    ["user_already_exists", "email_exists", "email_already_exists", "duplicate_email"].includes(code) ||
+    /user.*already registered|email (address )?.*(already (registered|exists|in use)|registered)|already (been )?registered/i.test(detail) ||
+    (code === "unexpected_failure" && /already exists|duplicate key.*email/i.test(detail))
+  ) {
+    return "Este e-mail já possui uma conta. Faça login ou use outro e-mail.";
   }
-  if (error.message?.includes("Database error"))
-    return "Não foi possível criar a conta. O e-mail ou o nome de usuário pode já estar em uso.";
+
+  if (/database error saving new user|database error creating new user/i.test(detail))
+    return "O Supabase não conseguiu salvar os dados do cadastro. Verifique o trigger de criação do perfil e os campos obrigatórios da tabela estudante.";
+
+  if (code === "email_not_confirmed")
+    return "Confirme seu e-mail antes de entrar. Confira sua caixa de entrada e a pasta de spam.";
+
+  switch (code) {
+    case "invalid_credentials":    return "E-mail ou senha incorretos.";
+    case "weak_password":          return "Senha fraca. Use pelo menos 8 caracteres.";
+    case "email_address_invalid":  return "Informe um endereço de e-mail válido.";
+    case "over_request_rate_limit":
+    case "over_email_send_rate_limit":
+    case "over_sms_send_rate_limit": return "Muitas tentativas. Aguarde um pouco e tente de novo.";
+    case "email_not_found":        return "Não encontramos uma conta com esse e-mail.";
+  }
+  if (/failed to fetch|networkerror|network request failed/i.test(detail))
+    return "Não foi possível conectar ao serviço de cadastro. Verifique sua conexão e tente novamente.";
+  if (/database error/i.test(detail))
+    return "Não foi possível salvar o cadastro no banco de dados. Verifique o trigger de criação do perfil.";
   return "Não foi possível concluir. Tente novamente.";
 }
 
@@ -156,7 +180,15 @@ async function handleLogin(form) {
   const password = form.elements.password.value;
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return setStatus(form, authMessage(error), "error");
+  if (error) {
+    console.error("[login] signInWithPassword retornou erro", {
+      code: error.code,
+      status: error.status,
+      message: error.message,
+      error,
+    });
+    return setStatus(form, authMessage(error), "error");
+  }
 
   // Busca a linha do estudante (a regra RLS só devolve a do próprio usuário)
   const { data: estudante, error: erroEstudante } = await supabase
@@ -199,11 +231,19 @@ async function handleSignup(form) {
       },
     },
   });
-  if (error) return setStatus(form, authMessage(error), "error");
+  if (error) {
+    console.error("[cadastro] signUp retornou erro", {
+      code: error.code,
+      status: error.status,
+      message: error.message,
+      error,
+    });
+    return setStatus(form, authMessage(error), "error");
+  }
 
   // E-mail já existente (com confirmação ligada o Supabase não dá erro, devolve identities vazio)
-  if (data.user && data.user.identities?.length === 0)
-    return setStatus(form, "Este e-mail já está cadastrado.", "error");
+  if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0)
+    return setStatus(form, "Este e-mail já possui uma conta. Faça login ou use outro e-mail.", "error");
 
   // 3) sem sessão = confirmação de e-mail ligada: usuário precisa confirmar antes
   if (!data.session)
