@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studyholics — Página Inicial</title>
-    <meta name="description" content="Entre ou crie sua conta no Studyholics." />
+    <meta name="description" content="Acompanhe seus estudos no Studyholics." />
     <link rel="icon" href="../assets/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../css/global.css" />
-    
+
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Tailwind Configuration -->
     <script>
         tailwind.config = {
@@ -47,7 +47,6 @@
             <!-- Logo Section -->
             <div class="p-8 flex flex-col items-center border-b border-white/10">
                 <div class="w-16 h-16 mb-3 flex items-center justify-center relative overflow-hidden">
-                    <!-- Simple SVG representation of the logo -->
                     <img src="../assets/imagens/studyholics-mark.png" alt="logo">
                 </div>
                 <h1 class="text-xl font-bold tracking-wide">Study<tag class="text-mint">holics</tag></h1>
@@ -81,7 +80,7 @@
                 <i class="fas fa-cog w-4 text-center"></i>
                 Configurações
             </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+            <a href="#" id="btn-sair" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
                 <i class="fas fa-sign-out-alt w-4 text-center"></i>
                 Sair
             </a>
@@ -90,7 +89,7 @@
 
     <!-- Main Content Area -->
     <main class="flex-1 flex flex-col h-full overflow-y-auto relative">
-        
+
         <!-- Top Navbar -->
         <header class="w-full px-8 py-5 flex items-center justify-between sticky top-0 bg-pageBg/90 backdrop-blur-md z-10">
             <!-- Search -->
@@ -106,7 +105,6 @@
                     <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-pageBg"></span>
                 </button>
                 <button class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden hover:ring-2 ring-mint transition-all">
-                    <!-- Profile Placeholder -->
                     <i class="fas fa-user text-gray-500"></i>
                 </button>
             </div>
@@ -114,11 +112,11 @@
 
         <!-- Dashboard Content -->
         <div class="px-8 pb-24 max-w-7xl mx-auto w-full flex-1">
-            
+
             <!-- Welcome Header -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 mt-4 gap-4">
                 <div>
-                    <h2 class="text-3xl font-extrabold text-darkBlue tracking-tight">Seja bem-vindo(a)!</h2>
+                    <h2 id="saudacao" class="text-3xl font-extrabold text-darkBlue tracking-tight">Seja bem-vindo(a)!</h2>
                     <p class="text-textMuted mt-1 font-medium">Pronto para continuar sua jornada?</p>
                 </div>
                 <div class="text-mint text-sm font-medium italic max-w-xs text-right opacity-90 hidden md:block">
@@ -126,20 +124,21 @@
                 </div>
             </div>
 
+            <p id="erro-home" role="alert" hidden class="mb-6 rounded-xl bg-red-50 text-red-700 text-sm font-semibold px-4 py-3"></p>
+
             <!-- Top Cards Row -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                
+
                 <!-- Card 1: Horas Estudadas -->
                 <div class="bg-mintLight rounded-3xl p-8 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
                     <div class="relative z-10 flex items-center gap-6">
-                        <!-- Big Icon -->
                         <div class="w-20 h-24 relative flex justify-center">
                             <img src="../assets/svg/icone-tempo.svg" alt="tempo icone" class="fas fa-hourglass-half text-6xl text-mint opacity-80">
                             <div class="absolute bottom-0 w-12 h-2 bg-darkBlue/10 rounded-full blur-sm"></div>
                         </div>
                         <div>
                             <h3 class="text-darkBlue font-semibold text-lg mb-1">Horas estudadas</h3>
-                            <p class="text-4xl font-extrabold text-darkBlue tracking-tight">12h 40min</p>
+                            <p id="horas-total" class="text-4xl font-extrabold text-darkBlue tracking-tight">…</p>
                         </div>
                     </div>
                 </div>
@@ -148,73 +147,70 @@
                 <div class="bg-mintLight rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between shadow-sm hover:shadow-md transition-shadow gap-4">
                     <div class="flex items-center gap-6 pl-4">
                         <div class="w-16 flex justify-center">
-                            <img src="../assets/svg/icone-trofeu.svg" alt="tempo icone" class="fas fa-hourglass-half text-6xl text-mint opacity-80">
+                            <img src="../assets/svg/icone-trofeu.svg" alt="troféu" class="fas fa-hourglass-half text-6xl text-mint opacity-80">
                         </div>
                         <div>
                             <h3 class="text-darkBlue font-semibold text-lg mb-0">Pontos</h3>
-                            <p class="text-4xl font-extrabold text-darkBlue tracking-tight mb-1">850 pts</p>
-                            <p class="text-sm font-medium text-darkBlue/70">Nível 3 - <span class="font-bold">Explorador I</span></p>
+                            <p id="pontos-total" class="text-4xl font-extrabold text-darkBlue tracking-tight mb-1">…</p>
+                            <p class="text-sm font-medium text-darkBlue/70"><span id="nivel-texto">Nível </span><span id="nivel-nome" class="font-bold"></span></p>
                         </div>
                     </div>
 
                     <!-- Badge Area -->
                     <div class="bg-darkBlue rounded-2xl p-4 flex flex-col items-center justify-center shadow-lg w-full sm:w-auto min-w-[140px]">
                         <div class="w-14 h-14 mb-2 border-white flex items-center justify-center">
-                            <!-- Character Icon inside Badge -->
                             <img src="../assets/imagens/titulos/explorador.png" alt="">
                         </div>
-                        <span class="text-mint text-xs font-bold uppercase tracking-wider">Explorador I</span>
+                        <span id="badge-nivel" class="text-mint text-xs font-bold uppercase tracking-wider">…</span>
                     </div>
                 </div>
             </div>
 
             <!-- Bottom Row: Progress & Recent Sessions -->
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                
+
                 <!-- Weekly Progress Chart (Col-span 3) -->
                 <div class="lg:col-span-3 bg-darkBlue rounded-3xl p-8 text-white shadow-lg relative overflow-hidden">
                     <div class="flex justify-between items-end mb-4 relative z-10">
                         <h3 class="text-xl font-bold">Progresso semanal</h3>
-                        <span class="text-sm text-gray-400 font-medium">4h de 6h da meta semanal</span>
+                        <span id="meta-texto" class="text-sm text-gray-400 font-medium">…</span>
                     </div>
-                    
+
                     <!-- Main Progress Bar -->
                     <div class="w-full bg-white/10 h-3 rounded-full mb-10 overflow-hidden relative z-10">
-                        <div class="bg-mint h-full rounded-full w-[66%] relative">
-                            <!-- Shine effect on bar -->
+                        <div id="meta-barra" class="bg-mint h-full rounded-full relative" style="width: 0%">
                             <div class="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-full"></div>
                         </div>
                     </div>
 
-                    <!-- Bar Chart Area -->
+                    <!-- Bar Chart Area (alturas e cores definidas em js/pagina-inicial.js) -->
                     <div class="flex justify-between items-end h-32 relative z-10 px-2 lg:px-4">
-                        <!-- Chart Bars (Heights set via inline style for demonstration, would be dynamic in React/JS) -->
                         <div class="flex flex-col items-center gap-2">
-                            <div class="w-8 lg:w-10 bg-gradient-to-t from-mint/80 to-mint rounded-t-md chart-bar" style="height: 40%;"></div>
+                            <div id="barra-0" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div>
                             <span class="text-xs font-medium text-gray-400">Seg</span>
                         </div>
                         <div class="flex flex-col items-center gap-2">
-                            <div class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 10%;"></div>
+                            <div id="barra-1" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div>
                             <span class="text-xs font-medium text-gray-400">Ter</span>
                         </div>
                         <div class="flex flex-col items-center gap-2">
-                            <div class="w-8 lg:w-10 bg-gradient-to-t from-mint/80 to-mint rounded-t-md chart-bar" style="height: 80%;"></div>
+                            <div id="barra-2" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div>
                             <span class="text-xs font-medium text-gray-400">Qua</span>
                         </div>
                         <div class="flex flex-col items-center gap-2">
-                            <div class="w-8 lg:w-10 bg-gradient-to-t from-mint/80 to-mint rounded-t-md chart-bar" style="height: 30%;"></div>
+                            <div id="barra-3" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div>
                             <span class="text-xs font-medium text-gray-400">Qui</span>
                         </div>
                         <div class="flex flex-col items-center gap-2">
-                            <div class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 15%;"></div>
+                            <div id="barra-4" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div>
                             <span class="text-xs font-medium text-gray-400">Sex</span>
                         </div>
                         <div class="flex flex-col items-center gap-2">
-                            <div class="w-8 lg:w-10 bg-gradient-to-t from-mint/80 to-mint rounded-t-md chart-bar" style="height: 60%;"></div>
+                            <div id="barra-5" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div>
                             <span class="text-xs font-medium text-gray-400">Sáb</span>
                         </div>
                         <div class="flex flex-col items-center gap-2">
-                            <div class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 10%;"></div>
+                            <div id="barra-6" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div>
                             <span class="text-xs font-medium text-gray-400">Dom</span>
                         </div>
                     </div>
@@ -229,30 +225,8 @@
                         </a>
                     </div>
 
-                    <div class="flex flex-col flex-1 justify-center gap-1">
-                        <!-- List Item 1 -->
-                        <div class="py-4 border-b border-gray-100 flex justify-between items-center group cursor-pointer hover:bg-gray-50 rounded-lg px-2 -mx-2 transition-colors">
-                            <div>
-                                <h4 class="font-bold text-mint group-hover:text-teal-600 transition-colors">Programação Python</h4>
-                                <p class="text-xs text-textMuted mt-1">Hoje, 14 de out. de 2026</p>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <span class="font-bold text-darkBlue">42 min</span>
-                                <i class="fas fa-chevron-right text-gray-300 group-hover:text-mint transition-colors"></i>
-                            </div>
-                        </div>
-
-                        <!-- List Item 2 -->
-                        <div class="py-4 border-b border-gray-100 flex justify-between items-center group cursor-pointer hover:bg-gray-50 rounded-lg px-2 -mx-2 transition-colors">
-                            <div>
-                                <h4 class="font-bold text-mint group-hover:text-teal-600 transition-colors">Estruturas de Dados</h4>
-                                <p class="text-xs text-textMuted mt-1">Ontem, 13 de out. de 2026</p>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <span class="font-bold text-darkBlue">42 min</span>
-                                <i class="fas fa-chevron-right text-gray-300 group-hover:text-mint transition-colors"></i>
-                            </div>
-                        </div>
+                    <div id="lista-sessoes" class="flex flex-col flex-1 justify-center gap-1">
+                        <p class="text-sm text-textMuted text-center">Carregando…</p>
                     </div>
                 </div>
 
@@ -271,7 +245,7 @@
         </div>
     </main>
 
-    <!-- Mobile Menu Overlay (Placeholder structure for mobile functionality) -->
+    <!-- Mobile Menu -->
     <div class="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 z-30 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
         <a href="pagina-inicial.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-mint">
             <i class="fas fa-home text-lg"></i>
@@ -291,19 +265,6 @@
         </a>
     </div>
 
-    <!-- Minimal JS for potential interactions -->
-    <script>
-        // Animations for the bars on load
-        window.addEventListener('DOMContentLoaded', () => {
-            const bars = document.querySelectorAll('.chart-bar');
-            bars.forEach(bar => {
-                const targetHeight = bar.style.height;
-                bar.style.height = '0%';
-                setTimeout(() => {
-                    bar.style.height = targetHeight;
-                }, 300);
-            });
-        });
-    </script>
+    <script type="module" src="../js/pagina-inicial.js"></script>
 </body>
 </html>

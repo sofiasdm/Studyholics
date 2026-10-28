@@ -12,11 +12,14 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: raiz("./index.html"),
+        cadastro: raiz("./pages/cadastro.html"),
         pagina_inicial: raiz("./pages/pagina-inicial.html"),
         pomodoro: raiz("./pages/pomodoro.html"),
         sessao: raiz("./pages/sessao-estudo.html"),
         conclusao: raiz("./pages/conclusao-sessao.html"),
         gamificacao: raiz("./pages/gamificacao.html"),
+        grupos: raiz("./pages/grupos.html"),
+        perfil: raiz("./pages/perfil.html"),
       },
     },
   },

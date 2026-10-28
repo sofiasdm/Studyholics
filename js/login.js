@@ -6,6 +6,9 @@ import {
   setStatus, withBusy, authMessage,
 } from "./auth.js";
 
+// Para onde ir depois de entrar (caminho relativo ao index.html)
+const PAGINA_INICIAL = "pages/pagina-inicial.html";
+
 // Botões com data-go="caminho" levam a outra página (ex.: "Criar conta")
 $$("[data-go]").forEach(btn =>
   btn.addEventListener("click", () => (window.location.href = btn.dataset.go))
@@ -17,19 +20,11 @@ async function entrar(form) {
   const email = form.elements.email.value.trim();
   const password = form.elements.password.value;
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return setStatus(form, authMessage(error), "error");
 
-  // Busca a linha do estudante (a regra RLS só devolve a do próprio usuário)
-  const { data: estudante, error: erroEstudante } = await supabase
-    .from("estudante")
-    .select("primeiro_nome, username, pontuacao")
-    .eq("id_usuario", data.user.id)
-    .maybeSingle();
-  if (erroEstudante) console.error(erroEstudante);
-
-  setStatus(form, `Bem-vindo(a), ${estudante?.primeiro_nome ?? "estudante"}!`);
-  // TODO: quando pages/dashboard.html existir, redirecione para ela aqui.
+  // A página inicial busca o nome e os pontos do usuário por conta própria.
+  window.location.href = PAGINA_INICIAL;
 }
 
 ativarMostrarSenha();

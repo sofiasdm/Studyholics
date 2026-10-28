@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studyholics - Pomodoro</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Link limpo para o novo ficheiro CSS -->
     <link rel="stylesheet" href="../css/pomodoro.css">
+    <style>
+        .campo-sessao { width: 100%; margin-top: 4px; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 8px; font: inherit; font-weight: 700; background: #fff; color: inherit; box-sizing: border-box; }
+        #aviso { margin: 12px 0 0; text-align: center; font-weight: 700; min-height: 1.2em; }
+        #aviso[data-tipo="erro"] { color: #c53030; }
+        #aviso[data-tipo="info"] { color: #2c7a7b; }
+    </style>
 </head>
 <body>
 
@@ -16,39 +20,41 @@
         <div id="tela-configuracao">
             <h2 class="titulo">Nova sessão</h2>
             <p class="subtitulo">Defina o que você vai estudar e por quanto tempo.</p>
-            
+
             <div class="cards-topo">
                 <div class="card-falso">
                     <div class="icone"></div>
                     <div class="textos">
-                        <label>Disciplina</label>
-                        <strong id="disc-nome">Programação Python</strong>
+                        <label for="sel-disciplina">Disciplina</label>
+                        <select id="sel-disciplina" class="campo-sessao" required>
+                            <option value="">Carregando…</option>
+                        </select>
                     </div>
                 </div>
                 <div class="card-falso">
                     <div class="icone"></div>
                     <div class="textos">
-                        <label>Conteúdo</label>
-                        <strong id="disc-conteudo">Estrutura de repetição</strong>
+                        <label for="input-topico">Tópico (opcional)</label>
+                        <input id="input-topico" class="campo-sessao" type="text" placeholder="Ex.: Estrutura de repetição" autocomplete="off">
                     </div>
                 </div>
             </div>
 
             <div class="config-tempos">
                 <div class="input-box">
-                    <label>Pomodoro</label>
-                    <input type="number" id="input-foco" value="25" min="1">
+                    <label for="input-foco">Pomodoro</label>
+                    <input type="number" id="input-foco" value="25" min="1" max="240">
                 </div>
                 <div class="input-box">
-                    <label>Pausa curta</label>
+                    <label for="input-pausa-curta">Pausa curta</label>
                     <input type="number" id="input-pausa-curta" value="5" min="1">
                 </div>
                 <div class="input-box">
-                    <label>Pausa longa</label>
+                    <label for="input-pausa-longa">Pausa longa</label>
                     <input type="number" id="input-pausa-longa" value="10" min="1">
                 </div>
                 <div class="input-box">
-                    <label>Intervalo longa</label>
+                    <label for="input-intervalo">Intervalo longa</label>
                     <input type="number" id="input-intervalo" value="4" min="1">
                 </div>
             </div>
@@ -57,10 +63,9 @@
         <!-- TELA 2: Andamento -->
         <div id="tela-andamento" style="display: none; text-align: center;">
             <h2 class="titulo">Sessão em andamento</h2>
-            <p class="subtitulo">Mantenha o foco! Você consegue!</p>
+            <p class="subtitulo" id="resumo-sessao">Mantenha o foco! Você consegue!</p>
             <h3 id="contador-sessao" style="font-size: 24px; margin-bottom: 5px;">Sessão: 1</h3>
-            
-            <!-- Botão de Voltar -->
+
             <button id="btn-voltar" class="btn-texto">← Voltar para configurações</button>
             <button id="btn-finalizar" class="btn-finalizar">Finalizar sessão</button>
         </div>
@@ -70,102 +75,10 @@
                 <div id="timer-display">25:00</div>
             </div>
             <button id="btn-acao" class="btn-verde">▶ Começar</button>
+            <p id="aviso" role="status" aria-live="polite"></p>
         </div>
     </div>
 
-    <script type="module">
-        import { PomodoroTimer } from "../js/pomodoro.js";
-        import { exigirLogin } from "../js/protecao.js";
-        import { iniciarSessao } from "../js/gamificacao.js";
-
-        const display = document.getElementById('timer-display');
-        const btnAcao = document.getElementById('btn-acao');
-        const btnVoltar = document.getElementById('btn-voltar');
-        const telaConfig = document.getElementById('tela-configuracao');
-        const telaAndamento = document.getElementById('tela-andamento');
-        const contadorSessao = document.getElementById('contador-sessao');
-
-        const btnFinalizar = document.getElementById('btn-finalizar');
-
-        let rodando = false;
-        let sessaoId = null;      // sessão registrada no banco (gamificação)
-        let segundosFoco = 0;     // só conta tempo em modo foco; o servidor ainda limita pelo relógio dele
-
-        exigirLogin();
-
-        const pomodoro = new PomodoroTimer(
-            (tempo) => {
-                display.textContent = tempo;
-                if (pomodoro.modo === 'foco') segundosFoco++;
-            },
-            (msg) => alert(msg),
-            (sessaoAtual) => contadorSessao.textContent = `Sessão: ${sessaoAtual}`
-        );
-
-        btnAcao.addEventListener('click', async () => {
-            if (!rodando) {
-                if (!sessaoId) {
-                    try {
-                        sessaoId = await iniciarSessao(
-                            document.getElementById('disc-nome').textContent.trim(),
-                            document.getElementById('disc-conteudo').textContent.trim(),
-                            parseInt(document.getElementById('input-foco').value) || 25
-                        );
-                    } catch (e) {
-                        alert(e.message);
-                        return;
-                    }
-                    // Configura só ao começar de verdade: "Continuar" não pode reiniciar o relógio
-                    pomodoro.configurar({
-                        foco: parseInt(document.getElementById('input-foco').value),
-                        pausaCurta: parseInt(document.getElementById('input-pausa-curta').value),
-                        pausaLonga: parseInt(document.getElementById('input-pausa-longa').value),
-                        intervalosPausaLonga: parseInt(document.getElementById('input-intervalo').value)
-                    });
-                    segundosFoco = 0; // configurar() dispara um tick; zera depois dele
-                }
-                pomodoro.iniciar();
-                rodando = true;
-                
-                telaConfig.style.display = 'none';
-                telaAndamento.style.display = 'block';
-                btnAcao.innerHTML = '⏸ Pausar';
-                btnAcao.style.backgroundColor = '#6c757d';
-            } else {
-                pomodoro.pausar();
-                rodando = false;
-                btnAcao.innerHTML = '▶ Continuar';
-                btnAcao.style.backgroundColor = '#48bb78';
-            }
-        });
-
-        // Lógica para interromper a sessão e voltar
-        btnVoltar.addEventListener('click', () => {
-            pomodoro.pausar();
-            rodando = false;
-            sessaoId = null; // abandonou: a sessão aberta é descartada pelo banco (sem pontos) na próxima
-            segundosFoco = 0;
-            
-            // Restaura visual do botão principal
-            btnAcao.innerHTML = '▶ Começar';
-            btnAcao.style.backgroundColor = '#48bb78';
-            
-            // Troca as telas
-            telaAndamento.style.display = 'none';
-            telaConfig.style.display = 'block';
-            
-            // Restaura o relógio para o tempo original escolhido
-            const tempoFocoOriginal = document.getElementById('input-foco').value;
-            display.textContent = `${tempoFocoOriginal.padStart(2, '0')}:00`;
-        });
-
-        // Encerra a sessão e vai para a tela de resumo/pontos (o banco calcula os pontos)
-        btnFinalizar.addEventListener('click', () => {
-            if (!sessaoId) return;
-            pomodoro.pausar();
-            rodando = false;
-            location.href = `conclusao-sessao.html?s=${encodeURIComponent(sessaoId)}&m=${Math.floor(segundosFoco / 60)}`;
-        });
-    </script>
+    <script type="module" src="../js/pomodoro-pagina.js"></script>
 </body>
 </html>
