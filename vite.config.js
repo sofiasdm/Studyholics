@@ -12,6 +12,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: raiz("./index.html"),
+        pagina_inicial: raiz("./pages/pagina-inicial.html"),
         pomodoro: raiz("./pages/pomodoro.html"),
         sessao: raiz("./pages/sessao-estudo.html"),
         conclusao: raiz("./pages/conclusao-sessao.html"),
