@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sessão concluída — Studyholics</title>
+  <link rel="icon" href="../assets/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/global.css" />
+  <link rel="stylesheet" href="../css/gamificacao.css" />
+</head>
+<body>
+  <main class="gam">
+    <!-- Etapa 1: resumo -->
+    <section id="etapa-resumo" hidden>
+      <h1>Sessão <span>concluída</span></h1>
+      <p class="subtitle" id="info-sessao"></p>
+      <form id="form-resumo" class="card" style="margin-top:16px" novalidate>
+        <h2>O que você estudou?</h2>
+        <p class="muted" id="dica-resumo"></p>
+        <textarea class="resumo" name="resumo" id="resumo" aria-describedby="erro-resumo contador" placeholder="Escreva um resumo da sessão…"></textarea>
+        <div class="linha"><p class="error" id="erro-resumo" role="alert"></p><p class="contador" id="contador"></p></div>
+        <button class="btn" type="submit" id="btn-enviar" style="margin-top:12px">Finalizar sessão</button>
+        <p class="status" id="status" hidden></p>
+      </form>
+    </section>
+
+    <!-- Etapa 2: resultado -->
+    <section id="etapa-resultado" hidden>
+      <div class="card pontos-topo">
+        <p class="muted">Pontos desta sessão</p>
+        <p class="grande" id="pontos-sessao">0</p>
+        <p class="muted" id="saldo-linha"></p>
+      </div>
+      <ul class="avisos" id="avisos" style="margin-top:16px"></ul>
+      <div class="links" style="margin-top:16px">
+        <a class="btn inline" style="display:inline-grid;place-items:center;text-decoration:none" href="gamificacao.html">Ver meu progresso</a>
+        <a class="btn sec inline" style="display:inline-grid;place-items:center;text-decoration:none" href="pomodoro.html">Nova sessão</a>
+      </div>
+    </section>
+
+    <p class="status" id="erro-geral" data-type="error" hidden></p>
+  </main>
+  <script type="module" src="../js/conclusao-sessao.js"></script>
+</body>
+</html>
