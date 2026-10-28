@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Studyholics — Estude. Evolua. Compartilhe</title>
+  <meta name="description" content="Entre ou crie sua conta no Studyholics." />
+  <link rel="icon" href="assets/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/global.css" />
+</head>
+<body>
+  <!-- ===== TELA: LOGIN ===== -->
+  <main class="screen login" id="login">
+    <header class="login-hero">
+      <img class="logo" src="assets/studyholics-mark.png" alt="Símbolo da Studyholics" />
+      <p class="wordmark">Study<span>holics</span></p>
+      <p class="tagline">Estude. Evolua. Compartilhe</p>
+    </header>
+    <section class="login-panel">
+      <div class="panel-inner">
+        <h1>Bem-vindo <span>de volta!</span></h1>
+        <p class="subtitle">Faça login para continuar sua jornada.</p>
+        <form class="login-card" novalidate>
+          <h2>Login</h2>
+          <div class="field"><input name="email" type="email" placeholder="E-mail" autocomplete="email" required /></div>
+          <div class="field password"><input name="password" type="password" placeholder="Senha" autocomplete="current-password" required /></div>
+          <button class="btn" type="submit">Entrar</button>
+          <p class="status" hidden></p>
+        </form>
+        <footer class="login-footer">
+          <p>Ainda não tem uma conta?</p>
+          <button class="btn" type="button" data-go="pages/cadastro.html">Criar conta</button>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+
+
+ <script type="module" src="js/login.js"></script>
+</body>
+</html>
