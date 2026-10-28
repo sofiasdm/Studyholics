@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meu progresso — Studyholics</title>
+  <link rel="icon" href="../assets/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/global.css" />
+  <link rel="stylesheet" href="../css/gamificacao.css" />
+</head>
+<body>
+  <main class="gam">
+    <div class="linha">
+      <h1>Meu <span>progresso</span></h1>
+      <a class="btn inline" style="display:inline-grid;place-items:center;text-decoration:none" href="pomodoro.html">Estudar</a>
+    </div>
+    <p class="status" id="erro-geral" data-type="error" hidden></p>
+
+    <section class="card" id="sec-nivel">
+      <div class="linha">
+        <div><p class="muted">Saldo</p><p class="grande" id="saldo">–</p></div>
+        <div style="text-align:right"><p class="muted">Nível</p><p class="grande" id="nivel-nome" style="font-size:26px">–</p></div>
+      </div>
+      <div class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="barra"><i id="barra-i" style="width:0%"></i></div>
+      <p class="muted" id="progresso-texto"></p>
+    </section>
+
+    <section><h2>Conquistas</h2><div class="grade" id="conquistas"></div></section>
+    <section><h2>Recompensas</h2><div class="grade" id="recompensas"></div></section>
+    <section class="card"><h2>Histórico de pontos</h2><ul class="lista" id="historico"></ul></section>
+    <section class="card"><h2>Meus resumos</h2><div id="resumos"></div></section>
+  </main>
+  <script type="module" src="../js/gamificacao-painel.js"></script>
+</body>
+</html>

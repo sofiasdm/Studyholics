@@ -1,28 +1,36 @@
-// pomodoro.js
+export class PomodoroTimer {
+    constructor(onTick, onAlarme, onMudarSessao) {
+        // Configurações padrão (serão sobrescritas pelo input do usuário)
+        this.config = {
+            foco: 25,
+            pausaCurta: 5,
+            pausaLonga: 10,
+            intervalosPausaLonga: 4
+        };
 
-class PomodoroTimer {
-    constructor(onTick, onAlarme) {
-        this.tempoFoco = 25 * 60; // 25 minutos em segundos
-        this.tempoPausa = 5 * 60; // 5 minutos em segundos
-        this.tempoRestante = this.tempoFoco;
+        this.tempoRestante = this.config.foco * 60;
         this.intervalo = null;
-        this.modo = 'foco'; // Pode ser 'foco' ou 'pausa'
-        
-        // Callbacks (funções que avisarão a futura tela HTML quando o tempo mudar)
-        this.onTick = onTick; 
+        this.modo = 'foco'; // 'foco', 'pausaCurta' ou 'pausaLonga'
+        this.ciclosCompletos = 0; // Quantos pomodoros foram concluídos
+
+        this.onTick = onTick;
         this.onAlarme = onAlarme;
+        this.onMudarSessao = onMudarSessao; 
+    }
+
+    // Recebe os valores dos inputs antes de começar
+    configurar(novasConfigs) {
+        this.config = { ...this.config, ...novasConfigs };
+        this.tempoRestante = this.config.foco * 60;
+        if (this.onTick) this.onTick(this.formatarTempo());
     }
 
     iniciar() {
-        if (this.intervalo) return; // Evita criar múltiplos relógios sobrepostos
-
+        if (this.intervalo) return;
         this.intervalo = setInterval(() => {
             this.tempoRestante--;
-            
-            // Avisa a interface que o tempo caiu 1 segundo
             if (this.onTick) this.onTick(this.formatarTempo());
 
-            // Quando o tempo zera, alterna entre Foco e Pausa
             if (this.tempoRestante <= 0) {
                 this.alternarModo();
             }
@@ -34,52 +42,37 @@ class PomodoroTimer {
         this.intervalo = null;
     }
 
-    zerar() {
-        this.pausar();
-        this.modo = 'foco';
-        this.tempoRestante = this.tempoFoco;
-        if (this.onTick) this.onTick(this.formatarTempo());
-    }
-
     alternarModo() {
         this.pausar();
+        
         if (this.modo === 'foco') {
-            this.modo = 'pausa';
-            this.tempoRestante = this.tempoPausa;
-            if (this.onAlarme) this.onAlarme('Hora de descansar! 5 minutos de pausa.');
+            this.ciclosCompletos++;
+            // Atualiza o texto "Sessão: X" na tela
+            if (this.onMudarSessao) this.onMudarSessao(this.ciclosCompletos + 1);
+
+            // Verifica se é hora da pausa longa baseado no intervalo configurado
+            if (this.ciclosCompletos % this.config.intervalosPausaLonga === 0) {
+                this.modo = 'pausaLonga';
+                this.tempoRestante = this.config.pausaLonga * 60;
+                if (this.onAlarme) this.onAlarme('Pausa longa! Descanse.');
+            } else {
+                this.modo = 'pausaCurta';
+                this.tempoRestante = this.config.pausaCurta * 60;
+                if (this.onAlarme) this.onAlarme('Pausa curta! Respire um pouco.');
+            }
         } else {
             this.modo = 'foco';
-            this.tempoRestante = this.tempoFoco;
-            if (this.onAlarme) this.onAlarme('Fim da pausa! De volta aos estudos.');
+            this.tempoRestante = this.config.foco * 60;
+            if (this.onAlarme) this.onAlarme('De volta ao foco!');
         }
         
-        // Inicia automaticamente o próximo ciclo
         if (this.onTick) this.onTick(this.formatarTempo());
         this.iniciar(); 
     }
 
-    // Método utilitário para devolver o tempo formatado (ex: "24:59")
     formatarTempo() {
         const min = Math.floor(this.tempoRestante / 60).toString().padStart(2, '0');
         const seg = (this.tempoRestante % 60).toString().padStart(2, '0');
         return `${min}:${seg}`;
     }
 }
-
-
-// ---------------------------------------------------------
-// TESTE DE MESA (apague ou comente quando for usar na tela real)
-// ---------------------------------------------------------
-
-// 1. Instanciamos a classe passando o que ela deve fazer a cada segundo e ao finalizar
-const meuEstudo = new PomodoroTimer(
-    (tempoFormatado) => console.log(`Tempo na tela: ${tempoFormatado}`),
-    (mensagem) => console.warn(`ALARME: ${mensagem}`)
-);
-
-// 2. Damos o play
-console.log("Iniciando cronômetro no background...");
-meuEstudo.iniciar();
-
-// (Opcional) Para ver a pausa acontecendo mais rápido em testes, 
-// altere temporariamente os 25*60 lá em cima para apenas 5 (5 segundos).
