@@ -5,80 +5,351 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studyholics - Pomodoro</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/pomodoro.css">
-    <style>
-        .campo-sessao { width: 100%; margin-top: 4px; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 8px; font: inherit; font-weight: 700; background: #fff; color: inherit; box-sizing: border-box; }
-        #aviso { margin: 12px 0 0; text-align: center; font-weight: 700; min-height: 1.2em; }
-        #aviso[data-tipo="erro"] { color: #c53030; }
-        #aviso[data-tipo="info"] { color: #2c7a7b; }
-    </style>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBlue: '#0B1F44',
+                        mint: '#44BBA4',
+                        mintLight: '#C8EBE4',
+                        pageBg: '#F4F7F6',
+                        textDark: '#0B1F44',
+                        textMuted: '#7a7a7a'
+                    },
+                    fontFamily: {
+                        inter: ['Nunito', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
+<body class="bg-pageBg font-inter text-textDark h-screen flex overflow-hidden">
 
-    <div class="pomodoro-container">
-        <!-- TELA 1: Configurações -->
-        <div id="tela-configuracao">
-            <h2 class="titulo">Nova sessão</h2>
-            <p class="subtitulo">Defina o que você vai estudar e por quanto tempo.</p>
+    <!-- Sidebar -->
+    <aside class="w-64 bg-darkBlue text-white flex-col justify-between hidden md:flex h-full relative z-20 shadow-xl">
+        <div class="flex flex-col w-full">
+            <div class="p-8 flex flex-col items-center border-b border-white/10">
+                <div class="w-16 h-16 mb-3 flex items-center justify-center relative overflow-hidden">
+                    <img src="../assets/imagens/studyholics-mark.png" alt="logo">
+                </div>
+                <h1 class="text-xl font-bold tracking-wide">Study<span class="text-mint">holics</span></h1>
+                <p class="text-[8px] text-white-400 mt-1 tracking-wider">Estude. Evolua. Compartilhe</p>
+            </div>
 
-            <div class="cards-topo">
-                <div class="card-falso">
-                    <div class="icone"></div>
-                    <div class="textos">
-                        <label for="sel-disciplina">Disciplina</label>
-                        <select id="sel-disciplina" class="campo-sessao" required>
-                            <option value="">Carregando…</option>
-                        </select>
+            <nav class="mt-6 flex flex-col gap-2 px-4">
+                <a href="pagina-inicial.html" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
+                    <i class="fas fa-home w-5 text-center"></i> Início
+                </a>
+                <a href="pomodoro.html" class="flex items-center gap-4 px-4 py-3 rounded-lg bg-gradient-to-r from-mint/100 to-transparent text-white font-semibold transition-all">
+                    <i class="fas fa-book-open w-5 text-center"></i> Estudar
+                </a>
+                <a href="grupos.html" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
+                    <i class="fas fa-users w-5 text-center"></i> Grupos
+                </a>
+                <a href="perfil.html" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
+                    <i class="fas fa-user w-5 text-center"></i> Perfil
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-6 border-t border-white/10 flex flex-col gap-2">
+            <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-cog w-4 text-center"></i> Configurações
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-sign-out-alt w-4 text-center"></i> Sair
+            </a>
+        </div>
+    </aside>
+
+    <div class="app-layout flex-1 flex flex-col h-full overflow-y-auto relative">
+        <!-- Topbar -->
+        <header class="w-full px-8 py-5 flex items-center justify-between sticky top-0 bg-pageBg/90 backdrop-blur-md z-10">
+            <div class="relative w-full max-w-md">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-textMuted"></i>
+                <input type="text" placeholder="Buscar..." class="w-full bg-gray-200/60 border-none rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-2 focus:ring-mint outline-none transition-all placeholder-gray-500 font-medium">
+            </div>
+
+            <div class="flex items-center gap-5 ml-4">
+                <button class="text-darkBlue hover:text-mint transition-colors relative">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-pageBg"></span>
+                </button>
+                <button class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden hover:ring-2 ring-mint transition-all">
+                    <i class="fas fa-user text-gray-500"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- ÁREA PRINCIPAL -->
+        <main class="main-area">
+            <div class="pomodoro-content">
+                
+                <!-- TELA 1: Configuração -->
+                <div id="tela-configuracao">
+                    <h2 class="titulo">Nova sessão</h2>
+                    <p class="subtitulo">Defina o que você vai estudar e por quanto tempo.</p>
+                    
+                    <div class="cards-disciplina">
+                        <div class="card-falso">
+                            <div class="icone-verde"><i class="fa-solid fa-tag"></i></div>
+                            <div class="textos">
+                                <label>Disciplina</label>
+                                <strong id="disc-nome">Programação Python</strong>
+                            </div>
+                        </div>
+                        <div class="card-falso">
+                            <div class="icone-verde"><i class="fa-solid fa-book"></i></div>
+                            <div class="textos">
+                                <label>Conteúdo</label>
+                                <strong id="disc-conteudo">Estrutura de repetição</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="config-tempos">
+                        <div class="input-box">
+                            <label>Pomodoro</label>
+                            <input type="number" id="input-foco" value="25" min="1">
+                        </div>
+                        <div class="input-box">
+                            <label>Pausa curta</label>
+                            <input type="number" id="input-pausa-curta" value="5" min="1">
+                        </div>
+                        <div class="input-box">
+                            <label>Pausa longa</label>
+                            <input type="number" id="input-pausa-longa" value="10" min="1">
+                        </div>
+                        <div class="input-box">
+                            <label>Intervalo longa</label>
+                            <input type="number" id="input-intervalo" value="4" min="1">
+                        </div>
                     </div>
                 </div>
-                <div class="card-falso">
-                    <div class="icone"></div>
-                    <div class="textos">
-                        <label for="input-topico">Tópico (opcional)</label>
-                        <input id="input-topico" class="campo-sessao" type="text" placeholder="Ex.: Estrutura de repetição" autocomplete="off">
+
+                <!-- TELA 2: Cabeçalho Andamento -->
+                <div id="tela-andamento-topo" style="display: none;">
+                    <h2 class="titulo">Sessão em andamento</h2>
+                    <p class="subtitulo">Mantenha o foco! Você consegue!</p>
+                </div>
+
+                <!-- RELÓGIO E BOTÕES -->
+                <div class="area-relogio">
+                    <div class="circulo-timer">
+                        <div id="timer-display">25:00</div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; flex-direction: column; align-items: center; width: 100%;">
+                        <button id="btn-acao" class="btn-verde">▶ Começar</button>
+                        <button id="btn-voltar" class="btn-texto" style="display: none;">← Voltar para configurações</button>
+                        <button id="btn-finalizar" class="btn-finalizar" style="display: none;">Finalizar sessão</button>
+                    </div>
+                </div>
+
+                <!-- TELA 2: Rodapé Andamento -->
+                <div id="tela-andamento-rodape" style="display: none;">
+                    <h3 id="contador-sessao" class="contador-titulo">Sessão: 1</h3>
+                    <div class="cards-disciplina cards-base">
+                        <div class="card-falso borda-fina">
+                            <div class="icone-verde"><i class="fa-solid fa-tag"></i></div>
+                            <div class="textos">
+                                <label>Disciplina</label>
+                                <strong>Programação Python</strong>
+                            </div>
+                        </div>
+                        <div class="card-falso borda-fina">
+                            <div class="icone-verde"><i class="fa-solid fa-book"></i></div>
+                            <div class="textos">
+                                <label>Conteúdo</label>
+                                <strong>Estrutura de repetição</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CAIXA DE RESUMO (MODAL) -->
+            <div id="modal-resumo" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <h3>Sessão Concluída! 🎉</h3>
+                    <p>Escreva um breve resumo do que estudou para computar a sua pontuação:</p>
+                    <textarea id="texto-resumo" rows="4" placeholder="Nesta sessão, eu aprendi sobre..."></textarea>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button id="btn-cancelar-resumo" class="btn-texto" style="margin-top: 0;">Cancelar</button>
+                        <button id="btn-salvar-resumo" class="btn-verde" style="width: 100%;">Salvar e Finalizar</button>
                     </div>
                 </div>
             </div>
-
-            <div class="config-tempos">
-                <div class="input-box">
-                    <label for="input-foco">Pomodoro</label>
-                    <input type="number" id="input-foco" value="25" min="1" max="240">
-                </div>
-                <div class="input-box">
-                    <label for="input-pausa-curta">Pausa curta</label>
-                    <input type="number" id="input-pausa-curta" value="5" min="1">
-                </div>
-                <div class="input-box">
-                    <label for="input-pausa-longa">Pausa longa</label>
-                    <input type="number" id="input-pausa-longa" value="10" min="1">
-                </div>
-                <div class="input-box">
-                    <label for="input-intervalo">Intervalo longa</label>
-                    <input type="number" id="input-intervalo" value="4" min="1">
-                </div>
-            </div>
-        </div>
-
-        <!-- TELA 2: Andamento -->
-        <div id="tela-andamento" style="display: none; text-align: center;">
-            <h2 class="titulo">Sessão em andamento</h2>
-            <p class="subtitulo" id="resumo-sessao">Mantenha o foco! Você consegue!</p>
-            <h3 id="contador-sessao" style="font-size: 24px; margin-bottom: 5px;">Sessão: 1</h3>
-
-            <button id="btn-voltar" class="btn-texto">← Voltar para configurações</button>
-            <button id="btn-finalizar" class="btn-finalizar">Finalizar sessão</button>
-        </div>
-
-        <div class="area-relogio">
-            <div class="circulo-timer">
-                <div id="timer-display">25:00</div>
-            </div>
-            <button id="btn-acao" class="btn-verde">▶ Começar</button>
-            <p id="aviso" role="status" aria-live="polite"></p>
-        </div>
+        </main>
     </div>
 
-    <script type="module" src="../js/pomodoro-pagina.js"></script>
+    <!-- Script Unificado ES Module -->
+    <script type="module">
+        import { PomodoroTimer } from "../js/pomodoro.js";
+
+        let exigirLogin = null;
+        let iniciarSessao = null;
+
+        try {
+            const protecao = await import("../js/protecao.js");
+            exigirLogin = protecao.exigirLogin;
+        } catch (e) {
+            console.warn("Módulo protecao.js não carregado localmente.");
+        }
+
+        try {
+            const gami = await import("../js/gamificacao-util.js");
+            iniciarSessao = gami.iniciarSessao;
+        } catch (e) {
+            console.warn("Módulo gamificacao-util.js não carregado localmente.");
+        }
+
+        const display = document.getElementById('timer-display');
+        const btnAcao = document.getElementById('btn-acao');
+        const btnVoltar = document.getElementById('btn-voltar');
+        const btnFinalizar = document.getElementById('btn-finalizar');
+        
+        const telaConfig = document.getElementById('tela-configuracao');
+        const telaAndamentoTopo = document.getElementById('tela-andamento-topo');
+        const telaAndamentoRodape = document.getElementById('tela-andamento-rodape');
+        const contadorSessao = document.getElementById('contador-sessao');
+        
+        const modalResumo = document.getElementById('modal-resumo');
+        const btnSalvarResumo = document.getElementById('btn-salvar-resumo');
+        const btnCancelarResumo = document.getElementById('btn-cancelar-resumo');
+        const textoResumo = document.getElementById('texto-resumo');
+
+        let rodando = false;
+        let sessaoAtiva = false;
+        let sessaoId = null;
+
+        if (typeof exigirLogin === 'function') {
+            try { exigirLogin(); } catch(e) { console.warn("Sessão sem login."); }
+        }
+
+        const pomodoro = new PomodoroTimer(
+            (tempo) => display.textContent = tempo,
+            (msg) => alert(msg),
+            (sessaoAtual) => contadorSessao.textContent = `Sessão: ${sessaoAtual}`
+        );
+
+        btnAcao.addEventListener('click', async () => {
+            if (!rodando) {
+                if (!sessaoAtiva) {
+                    if (typeof pomodoro.configurar === 'function') {
+                        pomodoro.configurar({
+                            foco: parseInt(document.getElementById('input-foco').value),
+                            pausaCurta: parseInt(document.getElementById('input-pausa-curta').value),
+                            pausaLonga: parseInt(document.getElementById('input-pausa-longa').value),
+                            intervalosPausaLonga: parseInt(document.getElementById('input-intervalo').value)
+                        });
+                    }
+                    sessaoAtiva = true;
+                }
+
+                if (!sessaoId && typeof iniciarSessao === 'function') {
+                    try {
+                        sessaoId = await iniciarSessao(
+                            document.getElementById('disc-nome').textContent.trim(),
+                            document.getElementById('disc-conteudo').textContent.trim(),
+                            parseInt(document.getElementById('input-foco').value) || 25
+                        );
+                    } catch (e) {
+                        console.error("Erro Supabase:", e.message);
+                    }
+                }
+
+                pomodoro.iniciar();
+                rodando = true;
+                
+                telaConfig.style.display = 'none';
+                telaAndamentoTopo.style.display = 'block';
+                telaAndamentoRodape.style.display = 'block';
+                btnVoltar.style.display = 'block';
+                btnFinalizar.style.display = 'block';
+                
+                btnAcao.innerHTML = '⏸ Pausar';
+                btnAcao.style.backgroundColor = '#65c994'; 
+            } else {
+                pomodoro.pausar();
+                rodando = false;
+                btnAcao.innerHTML = '▶ Continuar';
+                btnAcao.style.backgroundColor = '#44bba4';
+            }
+        });
+
+        btnVoltar.addEventListener('click', () => {
+            pomodoro.pausar();
+            rodando = false;
+            sessaoAtiva = false;
+            sessaoId = null;
+            
+            telaAndamentoTopo.style.display = 'none';
+            telaAndamentoRodape.style.display = 'none';
+            btnVoltar.style.display = 'none';
+            btnFinalizar.style.display = 'none';
+            telaConfig.style.display = 'block';
+            
+            btnAcao.innerHTML = '▶ Começar';
+            btnAcao.style.backgroundColor = '#44bba4';
+            
+            const tempoFocoOriginal = document.getElementById('input-foco').value;
+            display.textContent = `${tempoFocoOriginal.padStart(2, '0')}:00`;
+        });
+        
+        btnFinalizar.addEventListener('click', () => {
+            pomodoro.pausar();
+            rodando = false;
+            btnAcao.innerHTML = '▶ Continuar';
+            btnAcao.style.backgroundColor = '#44bba4';
+            modalResumo.style.display = 'flex';
+        });
+
+        btnCancelarResumo.addEventListener('click', () => {
+            modalResumo.style.display = 'none';
+        });
+
+        btnSalvarResumo.addEventListener('click', async () => {
+            const resumoTexto = textoResumo.value.trim();
+
+            // --- VARIÁVEIS PRONTAS PARA A PONTUAÇÃO / GAMIFICAÇÃO DA SOFIA ---
+            const totalSegundosFoco = pomodoro.msFoco ? Math.floor(pomodoro.msFoco / 1000) : 0;
+            const minutosFocados = pomodoro.minutosFocados || Math.floor(totalSegundosFoco / 60);
+            const sessaoFinalizada = true;
+            const temResumo = resumoTexto.length > 0;
+            const qtdPalavrasResumo = temResumo ? resumoTexto.split(/\s+/).filter(Boolean).length : 0;
+
+            const dadosGamificacaoSofia = {
+                sessaoId: sessaoId,
+                tempoSegundos: totalSegundosFoco,
+                minutosEstudados: minutosFocados,
+                sessaoFinalizada: sessaoFinalizada,
+                temResumo: temResumo,
+                qtdPalavrasResumo: qtdPalavrasResumo,
+                resumoTexto: resumoTexto
+            };
+
+            console.log("--> DADOS DA GAMIFICAÇÃO:", dadosGamificacaoSofia);
+
+            if (!temResumo) {
+                alert("Escreva um breve resumo para ganhar os seus pontos adicionais!");
+                return;
+            }
+
+            alert(`Sessão finalizada com sucesso!\nVocê estudou ${minutosFocados} minuto(s) e registrou ${qtdPalavrasResumo} palavras no resumo.`);
+            
+            modalResumo.style.display = 'none';
+            textoResumo.value = '';
+            btnVoltar.click(); 
+        });
+    </script>
 </body>
 </html>
