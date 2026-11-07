@@ -20,6 +20,7 @@ export default defineConfig({
         gamificacao: raiz("./pages/gamificacao.html"),
         grupos: raiz("./pages/grupos.html"),
         perfil: raiz("./pages/perfil.html"),
+        editar_perfil: raiz("./pages/editar-perfil.html"),
       },
     },
   },
