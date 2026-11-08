@@ -74,6 +74,46 @@
 .group-title > div, .info-card, .member-copy { min-width: 0; }
 .group-title p, #preview-description { white-space: pre-wrap; }
 
+.groups-heading-title {
+  position: relative;
+  display: flex;
+  gap: 8px;
+}
+.groups-help {
+  display: grid;
+  flex: none;
+  place-items: center;
+}
+.groups-app .groups-help-button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid #a9b8c7;
+  border-radius: 50%;
+  background: #f8fbfe;
+  color: var(--group-navy);
+  font-weight: 900;
+}
+.groups-help-button:hover, .groups-help-button:focus-visible { outline: 2px solid var(--group-mint); }
+.groups-heading .groups-help-tooltip {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-start: 0;
+  z-index: 3;
+  width: min(100%, 320px);
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--group-line);
+  border-radius: 8px;
+  background: #f8fbfe;
+  box-shadow: 0 8px 16px #0b1f4426;
+  line-height: 1.45;
+}
+.info-card dl .about-description { display: grid; gap: 6px; }
+.about-description dd { text-align: start; white-space: pre-wrap; }
+
 .join-search { position: relative; }
 .join-options {
   position: absolute;

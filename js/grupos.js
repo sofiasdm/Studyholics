@@ -254,6 +254,7 @@ function renderDetail(resetForms = false) {
   $("group-name").textContent = g.nome;
   $("group-count").textContent = `${g.membros.length} ${g.membros.length === 1 ? "membro" : "membros"}`;
   $("group-description").textContent = g.descricao || "Grupo de estudo";
+  $("about-description").textContent = g.descricao || "Sem descrição.";
   $("about-date").textContent = g.criado_em ? dateOnly.format(new Date(g.criado_em)) : "Não informada";
   $("about-subjects").textContent = g.disciplinas.join(", ") || "Nenhuma";
   $("leave-group").hidden = g.criador === state.userId;
@@ -382,6 +383,32 @@ function backToList() {
   loadDirectory();
 }
 
+const help = $("groups-help");
+const helpButton = $("groups-help-button");
+const helpText = $("groups-help-text");
+
+function setHelpOpen(open) {
+  helpText.hidden = !open;
+  helpButton.setAttribute("aria-expanded", String(open));
+}
+
+help.addEventListener("pointerenter", event => {
+  if (event.pointerType === "mouse") setHelpOpen(true);
+});
+help.addEventListener("pointerleave", event => {
+  if (event.pointerType === "mouse" && !helpButton.matches(":focus-visible")) setHelpOpen(false);
+});
+helpButton.addEventListener("focus", () => {
+  if (helpButton.matches(":focus-visible")) setHelpOpen(true);
+});
+helpButton.addEventListener("blur", () => setHelpOpen(false));
+helpButton.addEventListener("click", event => {
+  setHelpOpen(event.pointerType === "mouse" || helpText.hidden);
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && !helpText.hidden) setHelpOpen(false);
+});
+
 $("busca-grupos").addEventListener("input", renderList);
 $("open-create").addEventListener("click", () => show("create"));
 $("explore-more").addEventListener("click", () => loadDirectory(directoryCursor));
@@ -409,6 +436,7 @@ $("join-name").addEventListener("keydown", event => {
   }
 });
 document.addEventListener("pointerdown", event => {
+  if (!help.contains(event.target)) setHelpOpen(false);
   if (!$("join-search").contains(event.target)) closeSuggestions();
 });
 $("preview-start").addEventListener("click", () => {

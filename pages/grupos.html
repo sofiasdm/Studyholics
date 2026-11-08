@@ -42,7 +42,16 @@
       <p id="groups-status" class="groups-status" role="status" hidden></p>
 
       <section id="view-list" class="groups-view">
-        <div class="groups-heading"><div><h1>Grupos de estudo</h1><p>Conecte-se com estudantes, tire dúvidas e evoluam juntos!</p></div></div>
+        <div class="groups-heading">
+          <div class="groups-heading-title">
+            <h1>Grupos de Estudo</h1>
+            <div id="groups-help" class="groups-help">
+              <button id="groups-help-button" class="groups-help-button" type="button" aria-label="Como funcionam os grupos de estudo" aria-describedby="groups-help-text" aria-expanded="false">?</button>
+              <p id="groups-help-text" class="groups-help-tooltip" role="tooltip" hidden>Os grupos de estudo são para quem quer estudar em uma comunidade de studyholics. Possuem chats de mensagens, fóruns de discussão e ranking de estudos semanais. Escolha um para estudar com a galera!</p>
+            </div>
+          </div>
+          <p>Conecte-se com estudantes, tire dúvidas e evoluam juntos!</p>
+        </div>
         <div class="groups-list-layout">
           <section class="groups-mine" aria-labelledby="mine-heading">
             <h2 id="mine-heading" class="section-label">Seus grupos</h2>
@@ -131,6 +140,10 @@
             <div class="info-card">
               <h2>Informações do grupo</h2>
               <dl>
+                <div class="about-description">
+                  <dt>Descrição</dt>
+                  <dd id="about-description"></dd>
+                </div>
                 <div><dt><i class="fa-regular fa-calendar"></i> Criado em</dt><dd id="about-date"></dd></div>
                 <div><dt><i class="fa-solid fa-book"></i> Disciplinas</dt><dd id="about-subjects"></dd></div>
               </dl>
