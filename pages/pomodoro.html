@@ -22,7 +22,7 @@
                     <img src="../assets/imagens/studyholics-mark.png" alt="logo">
                 </div>
                 <h1 class="text-xl font-bold tracking-wide">Study<span class="text-mint">holics</span></h1>
-                
+
             </div>
             <!-- Adicionada a classe 'nav-link' para a trava de segurança -->
             <nav class="mt-6 flex flex-col gap-2 px-4">
@@ -51,27 +51,27 @@
             </div>
         </header>
 
-        <main class="main-area">
+        <main class="main-area"><p id="pomodoro-aviso" role="status" class="pomodoro-aviso" hidden></p>
             <div class="pomodoro-content">
-                
+
                 <!-- ================= TELA 1: CONFIGURAÇÃO ================= -->
                 <div id="tela-configuracao">
                     <h2 class="titulo">Nova sessão</h2>
                     <p class="subtitulo">Defina o que você vai estudar e por quanto tempo.</p>
-                    
+
                     <div class="cards-disciplina">
                         <div class="card-falso">
                             <div class="icone-verde"><i class="fa-solid fa-book-bookmark"></i></div>
                             <div class="textos">
                                 <label>Disciplina</label>
-                                <strong id="disc-nome">Programação Python</strong>
+                                <select id="disc-nome" aria-label="Disciplina"></select>
                             </div>
                         </div>
                         <div class="card-falso">
                             <div class="icone-verde"><i class="fa-solid fa-book-open"></i></div>
                             <div class="textos">
                                 <label>Conteúdo</label>
-                                <strong id="disc-conteudo">Estrutura de repetição</strong>
+                                <input id="disc-conteudo" maxlength="200" placeholder="O que você vai estudar?">
                             </div>
                         </div>
                     </div>
@@ -79,7 +79,7 @@
                     <div class="config-tempos">
                         <div class="input-box">
                             <label>Pomodoro</label>
-                            <div class="input-box-inner"><input type="number" id="input-foco" value="25" min="1"></div>
+                            <div class="input-box-inner"><input type="number" id="input-foco" value="25" min="1" max="240"></div>
                         </div>
                         <div class="input-box">
                             <label>Pausa curta</label>
@@ -109,7 +109,7 @@
                     <div class="area-relogio">
                         <div class="circulo-timer"><div id="timer-display-ativo">25:00</div></div>
                         <button id="btn-pausar-continuar" class="btn-verde"><i class="fa-solid fa-pause"></i> Pausar</button>
-                        
+
                         <div style="display: flex; gap: 15px; margin-top: 25px;">
                             <button id="btn-desistir" class="btn-texto">← Voltar para configurações</button>
                             <button id="btn-abrir-resumo" class="btn-borda-verde">Finalizar sessão</button>
@@ -120,11 +120,11 @@
                     <div class="cards-disciplina">
                         <div class="card-falso">
                             <div class="icone-verde"><i class="fa-solid fa-book-bookmark"></i></div>
-                            <div class="textos"><label>Disciplina</label><strong>Programação Python</strong></div>
+                            <div class="textos"><label>Disciplina</label><strong id="disc-nome-ativo">—</strong></div>
                         </div>
                         <div class="card-falso">
                             <div class="icone-verde"><i class="fa-solid fa-book-open"></i></div>
-                            <div class="textos"><label>Conteúdo</label><strong>Estrutura de repetição</strong></div>
+                            <div class="textos"><label>Conteúdo</label><strong id="disc-conteudo-ativo">—</strong></div>
                         </div>
                     </div>
                 </div>
@@ -132,8 +132,8 @@
                 <!-- ================= TELA 3: RESUMO ================= -->
                 <div id="tela-resumo" style="display: none;">
                     <h2 class="titulo">Concluir sessão</h2>
-                    <p class="subtitulo">Registre o que você aprendeu durante a sessão para garantir sua pontuação!</p>
-                    
+                    <p class="subtitulo">Seu tempo de foco será salvo. O resumo pode render pontos extras.</p>
+
                     <div class="caixa-resumo">
                         <div class="caixa-resumo-header">
                             <div class="icone-verde" style="background:#0b1f44; color:white;"><i class="fa-solid fa-file-lines"></i></div>
@@ -171,11 +171,11 @@
                             <h3 style="font-size:18px; font-weight:900; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">Resumo da sessão</h3>
                             <div class="resumo-item">
                                 <div class="icone-verde" style="background:#0b1f44; color:white;"><i class="fa-solid fa-book-bookmark"></i></div>
-                                <div><label style="font-size:12px; color:#64748b; font-weight:700;">Disciplina</label><div style="font-weight:800; color:#44bba4;">Programação Python</div></div>
+                                <div><label style="font-size:12px; color:#64748b; font-weight:700;">Disciplina</label><div id="disc-nome-final" style="font-weight:800; color:#44bba4;">—</div></div>
                             </div>
                             <div class="resumo-item">
                                 <div class="icone-verde" style="background:#0b1f44; color:white;"><i class="fa-solid fa-book-open"></i></div>
-                                <div><label style="font-size:12px; color:#64748b; font-weight:700;">Conteúdo</label><div style="font-weight:800; color:#44bba4;">Estrutura de repetição</div></div>
+                                <div><label style="font-size:12px; color:#64748b; font-weight:700;">Conteúdo</label><div id="disc-conteudo-final" style="font-weight:800; color:#44bba4;">—</div></div>
                             </div>
                             <div class="resumo-item">
                                 <div class="icone-verde" style="background:#0b1f44; color:white;"><i class="fa-solid fa-hourglass-half"></i></div>
@@ -205,189 +205,6 @@
         </main>
     </div>
 
-    <script type="module">
-        import { PomodoroTimer } from "../js/pomodoro.js";
-        
-        let iniciarSessao = null;
-        try { const gami = await import("../js/gamificacao-util.js"); iniciarSessao = gami.iniciarSessao; } catch (e) {}
-
-        // Telas
-        const telaConfig = document.getElementById('tela-configuracao');
-        const telaAndamento = document.getElementById('tela-andamento');
-        const telaResumo = document.getElementById('tela-resumo');
-        const telaConclusao = document.getElementById('tela-conclusao');
-        
-        // Displays e Inputs
-        const displayInicial = document.getElementById('timer-display-inicial');
-        const displayAtivo = document.getElementById('timer-display-ativo');
-        const inputFoco = document.getElementById('input-foco');
-        const textoResumo = document.getElementById('texto-resumo');
-        const contadorSessao = document.getElementById('contador-sessao');
-        
-        // Botoes
-        const btnIniciarSessao = document.getElementById('btn-iniciar-sessao');
-        const btnPausarContinuar = document.getElementById('btn-pausar-continuar');
-        const btnDesistir = document.getElementById('btn-desistir');
-        const btnAbrirResumo = document.getElementById('btn-abrir-resumo');
-        const btnCancelarResumo = document.getElementById('btn-cancelar-resumo');
-        const btnSalvarSessao = document.getElementById('btn-salvar-sessao');
-        const btnNovaSessao = document.getElementById('btn-nova-sessao');
-
-        // Modal de Segurança
-        const modalAviso = document.getElementById('modal-aviso-saida');
-        const btnFicar = document.getElementById('btn-ficar');
-        const btnConfirmarSaida = document.getElementById('btn-confirmar-saida');
-        const linksSidebar = document.querySelectorAll('.nav-link');
-
-        // Lógica de Estado
-        let rodando = false;
-        let bloqueioDeSaida = false; // A TRAVA DE SEGURANÇA
-        let linkDestinoPendente = null;
-        let sessaoId = null;
-
-        const pomodoro = new PomodoroTimer(
-            (tempo) => { displayAtivo.textContent = tempo; },
-            (msg) => console.log(msg),
-            (sessaoAtual) => contadorSessao.textContent = `Sessão: ${sessaoAtual}`
-        );
-
-        // Atualiza display config ao mudar o input
-        inputFoco.addEventListener('input', () => {
-            const val = inputFoco.value.padStart(2, '0');
-            displayInicial.textContent = `${val}:00`;
-            displayAtivo.textContent = `${val}:00`;
-        });
-
-        // 1. INICIAR SESSÃO
-        btnIniciarSessao.addEventListener('click', async () => {
-            if (typeof pomodoro.configurar === 'function') {
-                pomodoro.configurar({
-                    foco: parseInt(inputFoco.value),
-                    pausaCurta: parseInt(document.getElementById('input-pausa-curta').value),
-                    pausaLonga: parseInt(document.getElementById('input-pausa-longa').value),
-                    intervalosPausaLonga: parseInt(document.getElementById('input-intervalo').value)
-                });
-            }
-            
-            if (!sessaoId && typeof iniciarSessao === 'function') {
-                try { sessaoId = await iniciarSessao("Python", "Estrutura", parseInt(inputFoco.value)); } catch (e) {}
-            }
-
-            pomodoro.iniciar();
-            rodando = true;
-            bloqueioDeSaida = true; // ATIVA A TRAVA
-
-            telaConfig.style.display = 'none';
-            telaAndamento.style.display = 'block';
-            btnPausarContinuar.innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
-        });
-
-        // 2. PAUSAR / CONTINUAR
-        btnPausarContinuar.addEventListener('click', () => {
-            if (rodando) {
-                pomodoro.pausar();
-                rodando = false;
-                btnPausarContinuar.innerHTML = '<i class="fa-solid fa-play"></i> Continuar';
-            } else {
-                pomodoro.iniciar();
-                rodando = true;
-                btnPausarContinuar.innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
-            }
-        });
-
-        // 3. ABRIR TELA DE RESUMO
-        btnAbrirResumo.addEventListener('click', () => {
-            pomodoro.pausar();
-            rodando = false;
-            telaAndamento.style.display = 'none';
-            telaResumo.style.display = 'block';
-        });
-
-        btnCancelarResumo.addEventListener('click', () => {
-            telaResumo.style.display = 'none';
-            telaAndamento.style.display = 'block';
-        });
-
-        // 4. SALVAR E CONCLUIR
-        btnSalvarSessao.addEventListener('click', () => {
-            const resumo = textoResumo.value.trim();
-            if(!resumo) { alert("Escreva um resumo para ganhar pontos!"); return; }
-
-            // Pega os dados do JS do Deivid
-            const totalSegundos = pomodoro.msFoco ? Math.floor(pomodoro.msFoco / 1000) : 0;
-            const mins = pomodoro.minutosFocados || Math.floor(totalSegundos / 60);
-            
-            // Simulação de pontos: 5 pontos por minuto + 10 por ter resumo
-            const pontosGanhos = (mins * 5) + 10;
-
-            document.getElementById('pontos-display').textContent = `${pontosGanhos} pontos!`;
-            document.getElementById('display-tempo-final').textContent = `${mins} min`;
-
-            bloqueioDeSaida = false; // SESSÃO SALVA, REMOVE A TRAVA
-
-            telaResumo.style.display = 'none';
-            telaConclusao.style.display = 'block';
-        });
-
-        // 5. RESETAR TUDO (Voltar ao inicio)
-        btnNovaSessao.addEventListener('click', () => {
-            textoResumo.value = '';
-            sessaoId = null;
-            telaConclusao.style.display = 'none';
-            telaConfig.style.display = 'block';
-            displayInicial.textContent = `${inputFoco.value.padStart(2, '0')}:00`;
-            displayAtivo.textContent = displayInicial.textContent;
-        });
-
-        // ================= SISTEMA DE SEGURANÇA (BLOQUEIO DE SAÍDA) =================
-
-        // Clicou no botão "Voltar para configurações" no meio do andamento
-        btnDesistir.addEventListener('click', () => {
-            if (bloqueioDeSaida) {
-                linkDestinoPendente = 'RESET'; 
-                modalAviso.style.display = 'flex';
-            }
-        });
-
-        // Clicou em links da barra lateral
-        linksSidebar.forEach(link => {
-            link.addEventListener('click', (e) => {
-                if (bloqueioDeSaida) {
-                    e.preventDefault(); // Impede a navegação
-                    linkDestinoPendente = link.href;
-                    modalAviso.style.display = 'flex';
-                }
-            });
-        });
-
-        // Desistiu de sair
-        btnFicar.addEventListener('click', () => {
-            modalAviso.style.display = 'none';
-            linkDestinoPendente = null;
-        });
-
-        // Confirmou que quer perder o progresso e sair
-        btnConfirmarSaida.addEventListener('click', () => {
-            bloqueioDeSaida = false; 
-            if (linkDestinoPendente === 'RESET') {
-                pomodoro.pausar();
-                rodando = false;
-                sessaoId = null;
-                modalAviso.style.display = 'none';
-                telaAndamento.style.display = 'none';
-                telaConfig.style.display = 'block';
-            } else if (linkDestinoPendente) {
-                window.location.href = linkDestinoPendente; // Redireciona de facto
-            }
-        });
-
-        // Proteção do próprio navegador (se ele apertar F5 ou fechar a aba)
-        window.addEventListener('beforeunload', (e) => {
-            if (bloqueioDeSaida) {
-                e.preventDefault();
-                e.returnValue = ''; 
-            }
-        });
-    </script>
+    <script type="module" src="../js/pomodoro-ui.js"></script>
 </body>
 </html>

@@ -1,12 +1,12 @@
 // Cliente Supabase único, importado por app.js.
 import { createClient } from "@supabase/supabase-js";
 
-const url = import.meta.env.NEXT_PUBLIC_SUPABASE_URL;
-const key = import.meta.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const url = import.meta.env.VITE_SUPABASE_URL || import.meta.env.NEXT_PUBLIC_SUPABASE_URL;
+const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
 if (!url || !key) {
   throw new Error(
-    "Variáveis do Supabase ausentes. Confira o .env.local (e reinicie o 'npm run dev')."
+    "Variáveis do Supabase ausentes. Configure VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY."
   );
 }
 
