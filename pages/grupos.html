@@ -1,150 +1,81 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studyholics — Página Inicial</title>
-    <meta name="description" content="Entre ou crie sua conta no Studyholics." />
-    <link rel="icon" href="../assets/favicon.ico" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../css/global.css" />
-    
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Tailwind Configuration -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        darkBlue: '#0B1F44',
-                        mint: '#44BBA4',
-                        mintLight: '#C8EBE4',
-                        pageBg: '#F4F7F6',
-                        textDark: '#0B1F44',
-                        textMuted: '#7a7a7a'
-                    },
-                    fontFamily: {
-                        inter: ['Nunito', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="../css/pagina-inicial.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grupos de estudo — Studyholics</title>
+  <link rel="icon" href="../assets/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/grupos.css">
+  <script type="module" src="../js/grupos.js"></script>
 </head>
-<body class="bg-pageBg font-inter text-textDark h-screen flex overflow-hidden">
-
-    <!-- Sidebar -->
-    <aside class="w-64 bg-darkBlue text-white flex-col justify-between hidden md:flex h-full relative z-20 shadow-xl">
-
-        <div class="flex flex-col w-full">
-            <!-- Logo Section -->
-            <div class="p-8 flex flex-col items-center border-b border-white/10">
-                <div class="w-16 h-16 mb-3 flex items-center justify-center relative overflow-hidden">
-                    <!-- Simple SVG representation of the logo -->
-                    <img src="../assets/imagens/studyholics-mark.png" alt="logo">
-                </div>
-                <h1 class="text-xl font-bold tracking-wide">Study<tag class="text-mint">holics</tag></h1>
-                <p class="text-[8px] text-white-400 mt-1 tracking-wider">Estude. Evolua. Compartilhe</p>
-            </div>
-
-
-            <!-- Navigation -->
-            <nav class="mt-6 flex flex-col gap-2 px-4">
-                <a href="pagina-inicial.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
-                    <i class="fas fa-home w-5 text-center"></i>
-                    Início
-                </a>
-                <a href="pomodoro.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
-                    <i class="fas fa-book-open w-5 text-center"></i>
-                    Estudar
-                </a>
-                <a href="grupos.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg bg-gradient-to-r from-mint/100 to-transparent text-white font-semibold transition-all">
-                    <i class="fas fa-users w-5 text-center"></i>
-                    Grupos
-                </a>
-                <a href="perfil.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
-                    <i class="fas fa-user w-5 text-center"></i>
-                    Perfil
-                </a>
-            </nav>
-        </div>
-
-        <!-- Bottom Links -->
-        <div class="p-6 border-t border-white/10 flex flex-col gap-2">
-            <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
-                <i class="fas fa-cog w-4 text-center"></i>
-                Configurações
-            </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
-                <i class="fas fa-sign-out-alt w-4 text-center"></i>
-                Sair
-            </a>
-        </div>
-    </aside>
-
-    <main class="flex-1 flex flex-col h-full overflow-y-auto relative">
-        <!-- Top Navbar -->
-        <header class="w-full px-8 py-5 flex items-center justify-between sticky top-0 bg-pageBg/90 backdrop-blur-md z-10">
-            <!-- Search -->
-            <div class="relative w-full max-w-md">
-                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-textMuted"></i>
-                <input type="text" placeholder="Buscar..." class="w-full bg-gray-200/60 border-none rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-2 focus:ring-mint outline-none transition-all placeholder-gray-500 font-medium">
-            </div>
-
-            <!-- Profile & Notifications -->
-            <div class="flex items-center gap-5 ml-4">
-                <button class="text-darkBlue hover:text-mint transition-colors relative">
-                    <i class="fas fa-bell text-xl"></i>
-                    <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-pageBg"></span>
-                </button>
-                <button class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden hover:ring-2 ring-mint transition-all">
-                    <!-- Profile Placeholder -->
-                    <i class="fas fa-user text-gray-500"></i>
-                </button>
-            </div>
-        </header>
-    </main>
-
-    <!-- Mobile Menu Overlay (Placeholder structure for mobile functionality) -->
-    <div class="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 z-30 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
-        <a href="pagina-inicial.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-gray-400 hover:text-mint">
-            <i class="fas fa-home text-lg"></i>
-            <span class="text-[10px] font-semibold">Início</span>
-        </a>
-        <a href="pomodoro.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-gray-400 hover:text-mint">
-            <i class="fas fa-book-open text-lg"></i>
-            <span class="text-[10px] font-semibold">Estudar</span>
-        </a>
-        <a href="grupos.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-mint">
-            <i class="fas fa-users text-lg"></i>
-            <span class="text-[10px] font-semibold">Grupos</span>
-        </a>
-        <a href="perfil.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-gray-400 hover:text-mint">
-            <i class="fas fa-user text-lg"></i>
-            <span class="text-[10px] font-semibold">Perfil</span>
-        </a>
+<body class="groups-app">
+  <aside class="groups-sidebar">
+    <div>
+      <a class="groups-brand" href="pagina-inicial.html" aria-label="Studyholics, página inicial">
+        <img src="../assets/imagens/studyholics-mark.png" alt="">
+        <strong>Study<span>holics</span></strong>
+        <small>Estude. Evolua. Compartilhe</small>
+      </a>
+      <nav class="groups-nav" aria-label="Principal">
+        <a href="pagina-inicial.html"><i class="fa-solid fa-house"></i> Início</a>
+        <a href="pomodoro.html"><i class="fa-solid fa-book-open"></i> Estudar</a>
+        <a class="active" href="grupos.html" aria-current="page"><i class="fa-solid fa-users"></i> Grupos</a>
+        <a href="perfil.html"><i class="fa-solid fa-user"></i> Perfil</a>
+      </nav>
     </div>
+    <div class="groups-sidebar-bottom"><button type="button" id="btn-sair"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button></div>
+  </aside>
 
-    <!-- Minimal JS for potential interactions -->
-    <script>
-        // Animations for the bars on load
-        window.addEventListener('DOMContentLoaded', () => {
-            const bars = document.querySelectorAll('.chart-bar');
-            bars.forEach(bar => {
-                const targetHeight = bar.style.height;
-                bar.style.height = '0%';
-                setTimeout(() => {
-                    bar.style.height = targetHeight;
-                }, 300);
-            });
-        });
-    </script>
+  <div class="groups-shell">
+    <header class="groups-topbar">
+      <label class="groups-search"><i class="fa-solid fa-magnifying-glass"></i><input id="busca-grupos" type="search" placeholder="Buscar grupos..." aria-label="Buscar grupos"></label>
+      <div class="groups-top-actions"><a href="perfil.html" class="groups-avatar" aria-label="Perfil"><i class="fa-solid fa-user"></i></a></div>
+    </header>
+    <main class="groups-main">
+      <p id="groups-status" class="groups-status" role="status" hidden></p>
+
+      <section id="view-list" class="groups-view">
+        <div class="groups-heading"><div><h1>Grupos de estudo</h1><p>Conecte-se com estudantes, tire dúvidas e evoluam juntos!</p></div></div>
+        <div class="groups-list-layout">
+          <div><h2 class="section-label">Seus grupos</h2><div id="groups-list" class="groups-list"><p class="groups-empty">Carregando grupos…</p></div></div>
+          <div class="groups-action-column">
+            <div class="groups-action-card"><i class="fa-solid fa-users-rays" aria-hidden="true"></i><button id="open-create" class="primary-button" type="button">Criar grupo</button></div>
+            <form id="join-form" class="groups-action-card"><i class="fa-solid fa-user-group" aria-hidden="true"></i><label for="join-id">Entrar com a senha de acesso</label><input id="join-id" type="number" min="1" required placeholder="Número do grupo"><input id="join-password" type="password" required placeholder="Senha de acesso"><button class="primary-button" type="submit">Entrar</button></form>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-create" class="groups-view" hidden>
+        <button class="back-button" type="button" data-back><i class="fa-solid fa-chevron-left"></i> Voltar aos grupos</button>
+        <div class="groups-heading"><h1>Criar grupos de estudo</h1><p>Compartilhe conhecimento e construa grandes resultados!</p></div>
+        <form id="create-form" class="groups-form-card">
+          <label>Nome do grupo<input name="nome" maxlength="100" minlength="3" required placeholder="Ex.: Redes de computadores"></label>
+          <label>Descrição<textarea name="descricao" maxlength="500" rows="4" placeholder="Conte sobre os objetivos do grupo e como ele vai estudar."></textarea></label>
+          <label>Disciplinas do grupo <small>Separe por vírgulas. Use o mesmo nome no Pomodoro para contar no ranking.</small><input name="disciplinas" maxlength="600" required placeholder="Ex.: Programação 1, Matemática Discreta"></label>
+          <label>Senha de acesso <small>Compartilhe o número do grupo e esta senha com quem quiser convidar.</small><input name="senha" type="password" minlength="6" maxlength="80" required placeholder="Mínimo de 6 caracteres"></label>
+          <button class="primary-button" type="submit">Criar grupo</button>
+        </form>
+      </section>
+
+      <section id="view-detail" class="groups-view" hidden>
+        <button class="back-button" type="button" data-back><i class="fa-solid fa-chevron-left"></i> Voltar aos grupos</button>
+        <div class="group-title-row"><div class="group-title"><span class="group-title-icon"><i class="fa-solid fa-users"></i></span><div><h1 id="group-name"></h1><span id="group-count"></span><p id="group-description"></p></div></div><button id="leave-group" class="outline-danger" type="button">Sair do grupo</button></div>
+        <nav class="group-tabs" aria-label="Seções do grupo"><button class="selected" type="button" data-tab="conversas">Conversas</button><button type="button" data-tab="estudos">Estudos</button><button type="button" data-tab="membros">Membros</button><button type="button" data-tab="sobre">Sobre</button></nav>
+
+        <div id="tab-conversas" class="group-tab-panel"><div class="chat-card"><div class="chat-header"><h2>Conversas do grupo</h2><p>Compartilhe dúvidas, ideias e descobertas com os membros.</p></div><button id="older-messages" class="text-button" type="button" hidden>Carregar mensagens anteriores</button><div id="messages" class="messages" aria-live="polite"></div><form id="message-form" class="message-composer"><label class="sr-only" for="message-text">Sua mensagem</label><textarea id="message-text" maxlength="2000" rows="2" required placeholder="Escreva uma mensagem..."></textarea><button class="primary-button" type="submit" aria-label="Enviar mensagem"><i class="fa-solid fa-paper-plane"></i><span>Enviar</span></button></form></div></div>
+
+        <div id="tab-estudos" class="group-tab-panel" hidden><div class="study-heading"><div><h2>Estudos da semana</h2><p>Tempo de foco em disciplinas do grupo, de segunda a domingo.</p></div><a id="study-link" class="primary-button link-button" href="pomodoro.html">Começar a estudar</a></div><div id="study-subjects" class="subject-chips"></div><div class="study-grid"><div class="info-card"><h3>Ranking semanal</h3><ol id="study-ranking" class="ranking-list"></ol></div><div class="info-card"><h3>Estudando agora</h3><div id="studying-now"></div></div></div></div>
+
+        <div id="tab-membros" class="group-tab-panel" hidden><div class="members-heading"><h2 id="members-heading">Membros</h2><form id="invite-form" class="invite-form" hidden><label class="sr-only" for="invite-email">E-mail de cadastro</label><input id="invite-email" type="email" required placeholder="E-mail de cadastro"><button class="primary-button" type="submit">Adicionar</button></form></div><div id="members-list" class="members-list"></div></div>
+
+        <div id="tab-sobre" class="group-tab-panel" hidden><div class="about-grid"><div class="info-card"><h2>Informações do grupo</h2><dl><div><dt><i class="fa-regular fa-calendar"></i> Criado em</dt><dd id="about-date"></dd></div><div><dt><i class="fa-solid fa-book"></i> Disciplinas</dt><dd id="about-subjects"></dd></div><div><dt><i class="fa-solid fa-hashtag"></i> Número do grupo</dt><dd id="about-id"></dd></div></dl></div><div class="info-card" id="organizer-card" hidden><h2>Organização</h2><label>Senha de acesso<div class="password-row"><input id="group-password" type="password" readonly><button id="show-password" class="secondary-button" type="button">Mostrar</button></div></label><p class="help-text">Compartilhe o número e a senha para novos membros entrarem.</p><form id="subjects-form" class="subjects-form"><label for="edit-subjects">Disciplinas, separadas por vírgula</label><input id="edit-subjects" required maxlength="600"><button class="secondary-button" type="submit">Salvar disciplinas</button></form><button id="delete-group" class="outline-danger" type="button">Excluir grupo</button></div></div></div>
+      </section>
+    </main>
+  </div>
+  <nav class="groups-mobile-nav" aria-label="Principal no celular"><a href="pagina-inicial.html"><i class="fa-solid fa-house"></i>Início</a><a href="pomodoro.html"><i class="fa-solid fa-book-open"></i>Estudar</a><a class="active" href="grupos.html"><i class="fa-solid fa-users"></i>Grupos</a><a href="perfil.html"><i class="fa-solid fa-user"></i>Perfil</a></nav>
 </body>
 </html>
