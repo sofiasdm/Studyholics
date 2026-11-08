@@ -6,9 +6,11 @@ import {
   setError, setStatus, withBusy, authMessage,
 } from "./auth.js";
 
-// Para onde o botão "voltar" leva na etapa 1.
+// Para onde o botão "voltar" leva na etapa 1 (e para onde ir quando é preciso confirmar o e-mail).
 // Troque para "login.html" quando a página pages/login.html estiver pronta.
 const PAGINA_LOGIN = "../index.html";
+// Para onde ir quando o cadastro já deixa a pessoa logada (mesma pasta: pages/)
+const PAGINA_HOME = "pagina-inicial.html";
 
 // Limites da foto (iguais aos do bucket "avatars" no Supabase)
 const TIPOS_FOTO = ["image/jpeg", "image/png", "image/webp"];
@@ -91,18 +93,23 @@ async function cadastrar(form) {
   if (data.user && data.user.identities?.length === 0)
     return setStatus(form, "Este e-mail já está cadastrado.", "error");
 
-  // 3) sem sessão = confirmação de e-mail ligada: a pessoa precisa confirmar antes.
-  //    (Neste caso a foto escolhida não é enviada, porque ainda não há login.)
-  if (!data.session)
-    return setStatus(form, "Conta criada! Enviamos um link de confirmação para o seu e-mail.");
+  // 3) sem sessão = confirmação de e-mail ligada: a pessoa precisa confirmar antes
+  //    e depois entrar pelo login. (A foto escolhida não é enviada, porque ainda não há login.)
+  if (!data.session) {
+    setStatus(form, "Conta criada! Enviamos um link de confirmação para o seu e-mail. Levando você ao login…");
+    setTimeout(() => (window.location.href = PAGINA_LOGIN), 4000);
+    return;
+  }
 
   // 4) com sessão: envia a foto (opcional). Falha na foto não cancela o cadastro.
+  let mensagem = "Conta criada com sucesso! Bem-vindo(a) ao Studyholics.";
   const foto = $('input[name="photo"]', form).files[0];
   if (foto) {
     try { await uploadFoto(foto, data.user.id); }
-    catch (e) { console.error(e); return setStatus(form, "Conta criada! (A foto não pôde ser enviada.)"); }
+    catch (e) { console.error(e); mensagem = "Conta criada! (A foto não pôde ser enviada.)"; }
   }
-  setStatus(form, "Conta criada com sucesso! Bem-vindo(a) ao Studyholics.");
+  setStatus(form, mensagem);
+  setTimeout(() => (window.location.href = PAGINA_HOME), 1200);
 }
 
 async function uploadFoto(file, userId) {

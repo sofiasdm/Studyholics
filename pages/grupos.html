@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studyholics — Página Inicial</title>
+    <meta name="description" content="Entre ou crie sua conta no Studyholics." />
+    <link rel="icon" href="../assets/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/global.css" />
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBlue: '#0B1F44',
+                        mint: '#44BBA4',
+                        mintLight: '#C8EBE4',
+                        pageBg: '#F4F7F6',
+                        textDark: '#0B1F44',
+                        textMuted: '#7a7a7a'
+                    },
+                    fontFamily: {
+                        inter: ['Nunito', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="../css/pagina-inicial.css">
+</head>
+<body class="bg-pageBg font-inter text-textDark h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-darkBlue text-white flex-col justify-between hidden md:flex h-full relative z-20 shadow-xl">
+
+        <div class="flex flex-col w-full">
+            <!-- Logo Section -->
+            <div class="p-8 flex flex-col items-center border-b border-white/10">
+                <div class="w-16 h-16 mb-3 flex items-center justify-center relative overflow-hidden">
+                    <!-- Simple SVG representation of the logo -->
+                    <img src="../assets/imagens/studyholics-mark.png" alt="logo">
+                </div>
+                <h1 class="text-xl font-bold tracking-wide">Study<tag class="text-mint">holics</tag></h1>
+                <p class="text-[8px] text-white-400 mt-1 tracking-wider">Estude. Evolua. Compartilhe</p>
+            </div>
+
+
+            <!-- Navigation -->
+            <nav class="mt-6 flex flex-col gap-2 px-4">
+                <a href="pagina-inicial.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
+                    <i class="fas fa-home w-5 text-center"></i>
+                    Início
+                </a>
+                <a href="pomodoro.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
+                    <i class="fas fa-book-open w-5 text-center"></i>
+                    Estudar
+                </a>
+                <a href="grupos.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg bg-gradient-to-r from-mint/100 to-transparent text-white font-semibold transition-all">
+                    <i class="fas fa-users w-5 text-center"></i>
+                    Grupos
+                </a>
+                <a href="perfil.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
+                    <i class="fas fa-user w-5 text-center"></i>
+                    Perfil
+                </a>
+            </nav>
+        </div>
+
+        <!-- Bottom Links -->
+        <div class="p-6 border-t border-white/10 flex flex-col gap-2">
+            <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-cog w-4 text-center"></i>
+                Configurações
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-sign-out-alt w-4 text-center"></i>
+                Sair
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full overflow-y-auto relative">
+        <!-- Top Navbar -->
+        <header class="w-full px-8 py-5 flex items-center justify-between sticky top-0 bg-pageBg/90 backdrop-blur-md z-10">
+            <!-- Search -->
+            <div class="relative w-full max-w-md">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-textMuted"></i>
+                <input type="text" placeholder="Buscar..." class="w-full bg-gray-200/60 border-none rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-2 focus:ring-mint outline-none transition-all placeholder-gray-500 font-medium">
+            </div>
+
+            <!-- Profile & Notifications -->
+            <div class="flex items-center gap-5 ml-4">
+                <button class="text-darkBlue hover:text-mint transition-colors relative">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-pageBg"></span>
+                </button>
+                <button class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden hover:ring-2 ring-mint transition-all">
+                    <!-- Profile Placeholder -->
+                    <i class="fas fa-user text-gray-500"></i>
+                </button>
+            </div>
+        </header>
+    </main>
+
+    <!-- Mobile Menu Overlay (Placeholder structure for mobile functionality) -->
+    <div class="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 z-30 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+        <a href="pagina-inicial.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-gray-400 hover:text-mint">
+            <i class="fas fa-home text-lg"></i>
+            <span class="text-[10px] font-semibold">Início</span>
+        </a>
+        <a href="pomodoro.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-gray-400 hover:text-mint">
+            <i class="fas fa-book-open text-lg"></i>
+            <span class="text-[10px] font-semibold">Estudar</span>
+        </a>
+        <a href="grupos.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-mint">
+            <i class="fas fa-users text-lg"></i>
+            <span class="text-[10px] font-semibold">Grupos</span>
+        </a>
+        <a href="perfil.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-gray-400 hover:text-mint">
+            <i class="fas fa-user text-lg"></i>
+            <span class="text-[10px] font-semibold">Perfil</span>
+        </a>
+    </div>
+
+    <!-- Minimal JS for potential interactions -->
+    <script>
+        // Animations for the bars on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const bars = document.querySelectorAll('.chart-bar');
+            bars.forEach(bar => {
+                const targetHeight = bar.style.height;
+                bar.style.height = '0%';
+                setTimeout(() => {
+                    bar.style.height = targetHeight;
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>

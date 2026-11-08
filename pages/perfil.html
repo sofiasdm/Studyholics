@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studyholics — Meu perfil</title>
+    <meta name="description" content="Veja seu perfil, nível e estatísticas no Studyholics." />
+    <link rel="icon" href="../assets/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/global.css" />
+
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBlue: '#0B1F44',
+                        mint: '#44BBA4',
+                        mintLight: '#C8EBE4',
+                        pageBg: '#F4F7F6',
+                        textDark: '#0B1F44',
+                        textMuted: '#7a7a7a'
+                    },
+                    fontFamily: {
+                        inter: ['Nunito', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="../css/pagina-inicial.css">
+</head>
+<body class="bg-pageBg font-inter text-textDark h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-darkBlue text-white flex-col justify-between hidden md:flex h-full relative z-20 shadow-xl">
+
+        <div class="flex flex-col w-full">
+            <!-- Logo Section -->
+            <div class="p-8 flex flex-col items-center border-b border-white/10">
+                <div class="w-16 h-16 mb-3 flex items-center justify-center relative overflow-hidden">
+                    <img src="../assets/imagens/studyholics-mark.png" alt="logo">
+                </div>
+                <h1 class="text-xl font-bold tracking-wide">Study<span class="text-mint">holics</span></h1>
+                <p class="text-[8px] text-white-400 mt-1 tracking-wider">Estude. Evolua. Compartilhe</p>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="mt-6 flex flex-col gap-2 px-4">
+                <a href="pagina-inicial.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
+                    <i class="fas fa-home w-5 text-center"></i>
+                    Início
+                </a>
+                <a href="pomodoro.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
+                    <i class="fas fa-book-open w-5 text-center"></i>
+                    Estudar
+                </a>
+                <a href="grupos.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
+                    <i class="fas fa-users w-5 text-center"></i>
+                    Grupos
+                </a>
+                <a href="perfil.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg bg-gradient-to-r from-mint/100 to-transparent text-white font-semibold transition-all">
+                    <i class="fas fa-user w-5 text-center"></i>
+                    Perfil
+                </a>
+            </nav>
+        </div>
+
+        <!-- Bottom Links -->
+        <div class="p-6 border-t border-white/10 flex flex-col gap-2">
+            <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-cog w-4 text-center"></i>
+                Configurações
+            </a>
+            <a href="#" id="btn-sair" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-sign-out-alt w-4 text-center"></i>
+                Sair
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full overflow-y-auto relative">
+        <!-- Top Navbar -->
+        <header class="w-full px-8 py-5 flex items-center justify-between sticky top-0 bg-pageBg/90 backdrop-blur-md z-10">
+            <!-- Search -->
+            <div class="relative w-full max-w-md">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-textMuted"></i>
+                <input type="text" placeholder="Buscar..." class="w-full bg-gray-200/60 border-none rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-2 focus:ring-mint outline-none transition-all placeholder-gray-500 font-medium">
+            </div>
+
+            <!-- Profile & Notifications -->
+            <div class="flex items-center gap-5 ml-4">
+                <button class="text-darkBlue hover:text-mint transition-colors relative">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-pageBg"></span>
+                </button>
+                <a href="perfil.html" class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden hover:ring-2 ring-mint transition-all" aria-label="Meu perfil">
+                    <i class="fas fa-user text-gray-500"></i>
+                </a>
+            </div>
+        </header>
+
+        <div class="px-8 pb-24 max-w-6xl mx-auto w-full flex-1">
+
+            <p id="erro-perfil" role="alert" hidden class="mb-6 rounded-xl bg-red-50 text-red-700 text-sm font-semibold px-4 py-3"></p>
+
+            <!-- Linha 1: pessoa e nível -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+                <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm flex items-center gap-6">
+                    <div class="w-24 h-24 shrink-0 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+                        <img id="avatar-img" alt="Foto de perfil" class="w-full h-full object-cover" hidden>
+                        <i id="avatar-icone" class="fas fa-user text-3xl text-gray-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h2 id="nome-completo" class="text-3xl font-extrabold text-darkBlue tracking-tight truncate">…</h2>
+                        <p id="email" class="text-mint font-semibold text-sm truncate"></p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center gap-6">
+                    <div class="bg-darkBlue rounded-2xl w-24 h-24 shrink-0 flex items-center justify-center p-3">
+                        <img src="../assets/imagens/titulos/explorador.png" alt="">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-3xl font-extrabold text-darkBlue tracking-tight">Nível <span id="nivel-numero">–</span></h3>
+                        <p id="nivel-nome" class="text-mint text-sm font-bold">…</p>
+                        <div class="mt-3">
+                            <p id="xp-texto" class="text-xs text-right text-darkBlue/70 font-semibold mb-1">&nbsp;</p>
+                            <div class="w-full bg-gray-200 h-2.5 rounded-full overflow-hidden">
+                                <div id="xp-barra" class="bg-mint h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Linha 2: estatísticas e informações acadêmicas -->
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div class="lg:col-span-2 flex flex-col gap-4">
+                    <div class="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm flex items-center gap-5">
+                        <div class="w-14 h-14 shrink-0 rounded-full border-4 border-mint text-mint flex items-center justify-center text-xl">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-darkBlue">Horas estudadas</p>
+                            <p id="stat-horas" class="text-3xl font-extrabold text-darkBlue tracking-tight">…</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm flex items-center gap-5">
+                        <div class="w-14 h-14 shrink-0 rounded-full border-4 border-mint text-mint flex items-center justify-center text-xl">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-darkBlue">Sessões concluídas</p>
+                            <p id="stat-sessoes" class="text-3xl font-extrabold text-darkBlue tracking-tight">…</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm flex items-center gap-5">
+                        <div class="w-14 h-14 shrink-0 rounded-full border-4 border-mint text-mint flex items-center justify-center text-xl">
+                            <i class="fas fa-file-lines"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-darkBlue">Resumos feitos</p>
+                            <p id="stat-resumos" class="text-3xl font-extrabold text-darkBlue tracking-tight">…</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-3 bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+                    <h3 class="text-xl font-extrabold text-darkBlue text-center mb-6">Informações acadêmicas</h3>
+                    <div class="flex flex-col gap-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 shrink-0 rounded-full bg-darkBlue text-mint flex items-center justify-center">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xs text-textMuted font-semibold">Curso</p>
+                                <p id="info-curso" class="text-xl font-extrabold text-darkBlue">…</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 shrink-0 rounded-full bg-darkBlue text-mint flex items-center justify-center">
+                                <i class="fas fa-calendar-days"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xs text-textMuted font-semibold">Semestre</p>
+                                <p id="info-semestre" class="text-xl font-extrabold text-darkBlue">…</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 shrink-0 rounded-full bg-darkBlue text-mint flex items-center justify-center">
+                                <i class="fas fa-building-columns"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xs text-textMuted font-semibold">Campus</p>
+                                <p id="info-campus" class="text-xl font-extrabold text-darkBlue">…</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end">
+                <a href="editar-perfil.html" class="bg-mint hover:bg-[#3bb59d] text-white font-bold py-3 px-8 rounded-full inline-flex items-center gap-2 shadow-[0_8px_20px_rgba(76,201,176,0.35)] hover:-translate-y-0.5 transition-all">
+                    <i class="fas fa-pen text-sm"></i>
+                    Editar Perfil
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Menu -->
+    <div class="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 z-30 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+        <a href="pagina-inicial.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-gray-400 hover:text-mint">
+            <i class="fas fa-home text-lg"></i>
+            <span class="text-[10px] font-semibold">Início</span>
+        </a>
+        <a href="pomodoro.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-gray-400 hover:text-mint">
+            <i class="fas fa-book-open text-lg"></i>
+            <span class="text-[10px] font-semibold">Estudar</span>
+        </a>
+        <a href="grupos.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-gray-400 hover:text-mint">
+            <i class="fas fa-users text-lg"></i>
+            <span class="text-[10px] font-semibold">Grupos</span>
+        </a>
+        <a href="perfil.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-mint">
+            <i class="fas fa-user text-lg"></i>
+            <span class="text-[10px] font-semibold">Perfil</span>
+        </a>
+    </div>
+
+    <script type="module" src="../js/perfil-pagina.js"></script>
+</body>
+</html>

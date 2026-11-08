@@ -5,166 +5,388 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studyholics - Pomodoro</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Link limpo para o novo ficheiro CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/pomodoro.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { darkBlue: '#0B1F44', mint: '#44BBA4', pageBg: '#F4F7F6' }, fontFamily: { inter: ['Nunito', 'sans-serif'] } } } }
+    </script>
 </head>
-<body>
+<body class="bg-pageBg font-inter h-screen flex overflow-hidden">
 
-    <div class="pomodoro-container">
-        <!-- TELA 1: Configurações -->
-        <div id="tela-configuracao">
-            <h2 class="titulo">Nova sessão</h2>
-            <p class="subtitulo">Defina o que você vai estudar e por quanto tempo.</p>
-            
-            <div class="cards-topo">
-                <div class="card-falso">
-                    <div class="icone"></div>
-                    <div class="textos">
-                        <label>Disciplina</label>
-                        <strong id="disc-nome">Programação Python</strong>
+    <!-- Sidebar -->
+    <aside class="w-64 bg-darkBlue text-white flex-col justify-between hidden md:flex h-full relative z-20 shadow-xl">
+        <div class="flex flex-col w-full">
+            <div class="p-8 flex flex-col items-center border-b border-white/10">
+                <div class="w-16 h-16 mb-3 flex items-center justify-center relative overflow-hidden">
+                    <img src="../assets/imagens/studyholics-mark.png" alt="logo">
+                </div>
+                <h1 class="text-xl font-bold tracking-wide">Study<span class="text-mint">holics</span></h1>
+                
+            </div>
+            <!-- Adicionada a classe 'nav-link' para a trava de segurança -->
+            <nav class="mt-6 flex flex-col gap-2 px-4">
+                <a href="pagina-inicial.html" class="nav-link flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 transition-all"><i class="fas fa-home w-5"></i> Início</a>
+                <a href="pomodoro.html" class="nav-link flex items-center gap-4 px-4 py-3 rounded-lg bg-gradient-to-r from-mint/100 to-transparent text-white font-semibold"><i class="fas fa-book-open w-5"></i> Estudar</a>
+                <a href="grupos.html" class="nav-link flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 transition-all"><i class="fas fa-users w-5"></i> Grupos</a>
+                <a href="perfil.html" class="nav-link flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 transition-all"><i class="fas fa-user w-5"></i> Perfil</a>
+            </nav>
+        </div>
+        <div class="p-6 border-t border-white/10 flex flex-col gap-2">
+            <a href="#" class="nav-link flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white"><i class="fas fa-cog w-4"></i> Configurações</a>
+            <a href="#" class="nav-link flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white"><i class="fas fa-sign-out-alt w-4"></i> Sair</a>
+        </div>
+    </aside>
+
+    <div class="app-layout flex-1 flex flex-col h-full overflow-y-auto relative">
+        <!-- Topbar -->
+        <header class="w-full px-8 py-5 flex items-center justify-between sticky top-0 bg-[#f8fafc]/90 backdrop-blur-md z-10">
+            <div class="relative w-full max-w-md">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" placeholder="Buscar..." class="w-full bg-gray-200/60 border-none rounded-full py-2.5 pl-12 pr-4 text-sm outline-none font-medium">
+            </div>
+            <div class="flex items-center gap-5 ml-4">
+                <button class="text-darkBlue relative"><i class="fas fa-bell text-xl"></i><span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></span></button>
+                <button class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center"><i class="fas fa-user text-gray-500"></i></button>
+            </div>
+        </header>
+
+        <main class="main-area">
+            <div class="pomodoro-content">
+                
+                <!-- ================= TELA 1: CONFIGURAÇÃO ================= -->
+                <div id="tela-configuracao">
+                    <h2 class="titulo">Nova sessão</h2>
+                    <p class="subtitulo">Defina o que você vai estudar e por quanto tempo.</p>
+                    
+                    <div class="cards-disciplina">
+                        <div class="card-falso">
+                            <div class="icone-verde"><i class="fa-solid fa-book-bookmark"></i></div>
+                            <div class="textos">
+                                <label>Disciplina</label>
+                                <strong id="disc-nome">Programação Python</strong>
+                            </div>
+                        </div>
+                        <div class="card-falso">
+                            <div class="icone-verde"><i class="fa-solid fa-book-open"></i></div>
+                            <div class="textos">
+                                <label>Conteúdo</label>
+                                <strong id="disc-conteudo">Estrutura de repetição</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="config-tempos">
+                        <div class="input-box">
+                            <label>Pomodoro</label>
+                            <div class="input-box-inner"><input type="number" id="input-foco" value="25" min="1"></div>
+                        </div>
+                        <div class="input-box">
+                            <label>Pausa curta</label>
+                            <div class="input-box-inner"><input type="number" id="input-pausa-curta" value="5" min="1"></div>
+                        </div>
+                        <div class="input-box">
+                            <label>Pausa longa</label>
+                            <div class="input-box-inner"><input type="number" id="input-pausa-longa" value="10" min="1"></div>
+                        </div>
+                        <div class="input-box">
+                            <label>Intervalo de pausa longa</label>
+                            <div class="input-box-inner"><input type="number" id="input-intervalo" value="4" min="1"></div>
+                        </div>
+                    </div>
+
+                    <div class="area-relogio">
+                        <div class="circulo-timer"><div id="timer-display-inicial">25:00</div></div>
+                        <button id="btn-iniciar-sessao" class="btn-verde"><i class="fa-solid fa-play"></i> Começar</button>
                     </div>
                 </div>
-                <div class="card-falso">
-                    <div class="icone"></div>
-                    <div class="textos">
-                        <label>Conteúdo</label>
-                        <strong id="disc-conteudo">Estrutura de repetição</strong>
+
+                <!-- ================= TELA 2: ANDAMENTO ================= -->
+                <div id="tela-andamento" style="display: none;">
+                    <h2 class="titulo">Sessão em andamento</h2>
+                    <p class="subtitulo">Mantenha o foco! Você consegue!</p>
+
+                    <div class="area-relogio">
+                        <div class="circulo-timer"><div id="timer-display-ativo">25:00</div></div>
+                        <button id="btn-pausar-continuar" class="btn-verde"><i class="fa-solid fa-pause"></i> Pausar</button>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 25px;">
+                            <button id="btn-desistir" class="btn-texto">← Voltar para configurações</button>
+                            <button id="btn-abrir-resumo" class="btn-borda-verde">Finalizar sessão</button>
+                        </div>
+                    </div>
+
+                    <h3 id="contador-sessao" style="text-align:center; font-size:20px; font-weight:900; margin-top:40px; margin-bottom: 20px;">Sessão: 1</h3>
+                    <div class="cards-disciplina">
+                        <div class="card-falso">
+                            <div class="icone-verde"><i class="fa-solid fa-book-bookmark"></i></div>
+                            <div class="textos"><label>Disciplina</label><strong>Programação Python</strong></div>
+                        </div>
+                        <div class="card-falso">
+                            <div class="icone-verde"><i class="fa-solid fa-book-open"></i></div>
+                            <div class="textos"><label>Conteúdo</label><strong>Estrutura de repetição</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= TELA 3: RESUMO ================= -->
+                <div id="tela-resumo" style="display: none;">
+                    <h2 class="titulo">Concluir sessão</h2>
+                    <p class="subtitulo">Registre o que você aprendeu durante a sessão para garantir sua pontuação!</p>
+                    
+                    <div class="caixa-resumo">
+                        <div class="caixa-resumo-header">
+                            <div class="icone-verde" style="background:#0b1f44; color:white;"><i class="fa-solid fa-file-lines"></i></div>
+                            <div>
+                                <h3>Resumo do aprendizado</h3>
+                                <p>Conte o que você aprendeu, os principais pontos e dúvidas que ainda tem.</p>
+                            </div>
+                        </div>
+                        <textarea id="texto-resumo" placeholder="Ex.: Aprendi a usar o laço for para repetir comandos..."></textarea>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; gap: 20px;">
+                        <button id="btn-cancelar-resumo" class="btn-texto">Voltar para o timer</button>
+                        <button id="btn-salvar-sessao" class="btn-verde"><i class="fa-regular fa-floppy-disk"></i> Salvar sessão</button>
+                    </div>
+                </div>
+
+                <!-- ================= TELA 4: CONCLUSÃO (PONTOS) ================= -->
+                <div id="tela-conclusao" style="display: none;">
+                    <div class="conclusao-grid">
+                        <div class="conclusao-esquerda">
+                            <!-- Placeholder para o mascote -->
+                            <div style="font-size: 80px; color: #44bba4; margin-bottom: 20px;"><i class="fa-solid fa-face-smile-wink"></i></div>
+                            <h2 class="titulo">Sessão concluída!</h2>
+                            <p class="subtitulo" style="margin-bottom:0;">Seu esforço hoje constrói o seu amanhã!</p>
+                            <div class="box-pontos">
+                                <div style="background:white; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; color:#44bba4; font-size:20px;"><i class="fa-solid fa-star"></i></div>
+                                <div>
+                                    <span style="font-size:12px; font-weight:700; color:#64748b;">Você ganhou</span>
+                                    <h2 id="pontos-display">0 pontos!</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="conclusao-direita">
+                            <h3 style="font-size:18px; font-weight:900; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">Resumo da sessão</h3>
+                            <div class="resumo-item">
+                                <div class="icone-verde" style="background:#0b1f44; color:white;"><i class="fa-solid fa-book-bookmark"></i></div>
+                                <div><label style="font-size:12px; color:#64748b; font-weight:700;">Disciplina</label><div style="font-weight:800; color:#44bba4;">Programação Python</div></div>
+                            </div>
+                            <div class="resumo-item">
+                                <div class="icone-verde" style="background:#0b1f44; color:white;"><i class="fa-solid fa-book-open"></i></div>
+                                <div><label style="font-size:12px; color:#64748b; font-weight:700;">Conteúdo</label><div style="font-weight:800; color:#44bba4;">Estrutura de repetição</div></div>
+                            </div>
+                            <div class="resumo-item">
+                                <div class="icone-verde" style="background:#0b1f44; color:white;"><i class="fa-solid fa-hourglass-half"></i></div>
+                                <div><label style="font-size:12px; color:#64748b; font-weight:700;">Tempo estudado</label><div id="display-tempo-final" style="font-weight:800; color:#44bba4;">0 min</div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 40px;">
+                        <button id="btn-nova-sessao" class="btn-verde"><i class="fa-solid fa-rotate-right"></i> Iniciar nova sessão</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- MODAL DE AVISO: PROTEÇÃO DE SAÍDA -->
+            <div id="modal-aviso-saida" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <h3><i class="fa-solid fa-triangle-exclamation"></i> Atenção!</h3>
+                    <p>Tem a certeza de que deseja sair? A sessão atual será encerrada e <strong>o tempo não guardado será perdido</strong>.</p>
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button id="btn-ficar" class="btn-verde" style="background-color: #64748b;">Continuar a estudar</button>
+                        <button id="btn-confirmar-saida" class="btn-verde" style="background-color: #e11d48;">Sim, quero sair</button>
                     </div>
                 </div>
             </div>
 
-            <div class="config-tempos">
-                <div class="input-box">
-                    <label>Pomodoro</label>
-                    <input type="number" id="input-foco" value="25" min="1">
-                </div>
-                <div class="input-box">
-                    <label>Pausa curta</label>
-                    <input type="number" id="input-pausa-curta" value="5" min="1">
-                </div>
-                <div class="input-box">
-                    <label>Pausa longa</label>
-                    <input type="number" id="input-pausa-longa" value="10" min="1">
-                </div>
-                <div class="input-box">
-                    <label>Intervalo longa</label>
-                    <input type="number" id="input-intervalo" value="4" min="1">
-                </div>
-            </div>
-        </div>
-
-        <!-- TELA 2: Andamento -->
-        <div id="tela-andamento" style="display: none; text-align: center;">
-            <h2 class="titulo">Sessão em andamento</h2>
-            <p class="subtitulo">Mantenha o foco! Você consegue!</p>
-            <h3 id="contador-sessao" style="font-size: 24px; margin-bottom: 5px;">Sessão: 1</h3>
-            
-            <!-- Botão de Voltar -->
-            <button id="btn-voltar" class="btn-texto">← Voltar para configurações</button>
-            <button id="btn-finalizar" class="btn-finalizar">Finalizar sessão</button>
-        </div>
-
-        <div class="area-relogio">
-            <div class="circulo-timer">
-                <div id="timer-display">25:00</div>
-            </div>
-            <button id="btn-acao" class="btn-verde">▶ Começar</button>
-        </div>
+        </main>
     </div>
 
     <script type="module">
         import { PomodoroTimer } from "../js/pomodoro.js";
-        import { exigirLogin } from "../js/protecao.js";
-        import { iniciarSessao } from "../js/gamificacao.js";
+        
+        let iniciarSessao = null;
+        try { const gami = await import("../js/gamificacao-util.js"); iniciarSessao = gami.iniciarSessao; } catch (e) {}
 
-        const display = document.getElementById('timer-display');
-        const btnAcao = document.getElementById('btn-acao');
-        const btnVoltar = document.getElementById('btn-voltar');
+        // Telas
         const telaConfig = document.getElementById('tela-configuracao');
         const telaAndamento = document.getElementById('tela-andamento');
+        const telaResumo = document.getElementById('tela-resumo');
+        const telaConclusao = document.getElementById('tela-conclusao');
+        
+        // Displays e Inputs
+        const displayInicial = document.getElementById('timer-display-inicial');
+        const displayAtivo = document.getElementById('timer-display-ativo');
+        const inputFoco = document.getElementById('input-foco');
+        const textoResumo = document.getElementById('texto-resumo');
         const contadorSessao = document.getElementById('contador-sessao');
+        
+        // Botoes
+        const btnIniciarSessao = document.getElementById('btn-iniciar-sessao');
+        const btnPausarContinuar = document.getElementById('btn-pausar-continuar');
+        const btnDesistir = document.getElementById('btn-desistir');
+        const btnAbrirResumo = document.getElementById('btn-abrir-resumo');
+        const btnCancelarResumo = document.getElementById('btn-cancelar-resumo');
+        const btnSalvarSessao = document.getElementById('btn-salvar-sessao');
+        const btnNovaSessao = document.getElementById('btn-nova-sessao');
 
-        const btnFinalizar = document.getElementById('btn-finalizar');
+        // Modal de Segurança
+        const modalAviso = document.getElementById('modal-aviso-saida');
+        const btnFicar = document.getElementById('btn-ficar');
+        const btnConfirmarSaida = document.getElementById('btn-confirmar-saida');
+        const linksSidebar = document.querySelectorAll('.nav-link');
 
+        // Lógica de Estado
         let rodando = false;
-        let sessaoId = null;      // sessão registrada no banco (gamificação)
-        let segundosFoco = 0;     // só conta tempo em modo foco; o servidor ainda limita pelo relógio dele
-
-        exigirLogin();
+        let bloqueioDeSaida = false; // A TRAVA DE SEGURANÇA
+        let linkDestinoPendente = null;
+        let sessaoId = null;
 
         const pomodoro = new PomodoroTimer(
-            (tempo) => {
-                display.textContent = tempo;
-                if (pomodoro.modo === 'foco') segundosFoco++;
-            },
-            (msg) => alert(msg),
+            (tempo) => { displayAtivo.textContent = tempo; },
+            (msg) => console.log(msg),
             (sessaoAtual) => contadorSessao.textContent = `Sessão: ${sessaoAtual}`
         );
 
-        btnAcao.addEventListener('click', async () => {
-            if (!rodando) {
-                if (!sessaoId) {
-                    try {
-                        sessaoId = await iniciarSessao(
-                            document.getElementById('disc-nome').textContent.trim(),
-                            document.getElementById('disc-conteudo').textContent.trim(),
-                            parseInt(document.getElementById('input-foco').value) || 25
-                        );
-                    } catch (e) {
-                        alert(e.message);
-                        return;
-                    }
-                    // Configura só ao começar de verdade: "Continuar" não pode reiniciar o relógio
-                    pomodoro.configurar({
-                        foco: parseInt(document.getElementById('input-foco').value),
-                        pausaCurta: parseInt(document.getElementById('input-pausa-curta').value),
-                        pausaLonga: parseInt(document.getElementById('input-pausa-longa').value),
-                        intervalosPausaLonga: parseInt(document.getElementById('input-intervalo').value)
-                    });
-                    segundosFoco = 0; // configurar() dispara um tick; zera depois dele
-                }
-                pomodoro.iniciar();
-                rodando = true;
-                
-                telaConfig.style.display = 'none';
-                telaAndamento.style.display = 'block';
-                btnAcao.innerHTML = '⏸ Pausar';
-                btnAcao.style.backgroundColor = '#6c757d';
-            } else {
+        // Atualiza display config ao mudar o input
+        inputFoco.addEventListener('input', () => {
+            const val = inputFoco.value.padStart(2, '0');
+            displayInicial.textContent = `${val}:00`;
+            displayAtivo.textContent = `${val}:00`;
+        });
+
+        // 1. INICIAR SESSÃO
+        btnIniciarSessao.addEventListener('click', async () => {
+            if (typeof pomodoro.configurar === 'function') {
+                pomodoro.configurar({
+                    foco: parseInt(inputFoco.value),
+                    pausaCurta: parseInt(document.getElementById('input-pausa-curta').value),
+                    pausaLonga: parseInt(document.getElementById('input-pausa-longa').value),
+                    intervalosPausaLonga: parseInt(document.getElementById('input-intervalo').value)
+                });
+            }
+            
+            if (!sessaoId && typeof iniciarSessao === 'function') {
+                try { sessaoId = await iniciarSessao("Python", "Estrutura", parseInt(inputFoco.value)); } catch (e) {}
+            }
+
+            pomodoro.iniciar();
+            rodando = true;
+            bloqueioDeSaida = true; // ATIVA A TRAVA
+
+            telaConfig.style.display = 'none';
+            telaAndamento.style.display = 'block';
+            btnPausarContinuar.innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
+        });
+
+        // 2. PAUSAR / CONTINUAR
+        btnPausarContinuar.addEventListener('click', () => {
+            if (rodando) {
                 pomodoro.pausar();
                 rodando = false;
-                btnAcao.innerHTML = '▶ Continuar';
-                btnAcao.style.backgroundColor = '#48bb78';
+                btnPausarContinuar.innerHTML = '<i class="fa-solid fa-play"></i> Continuar';
+            } else {
+                pomodoro.iniciar();
+                rodando = true;
+                btnPausarContinuar.innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
             }
         });
 
-        // Lógica para interromper a sessão e voltar
-        btnVoltar.addEventListener('click', () => {
+        // 3. ABRIR TELA DE RESUMO
+        btnAbrirResumo.addEventListener('click', () => {
             pomodoro.pausar();
             rodando = false;
-            sessaoId = null; // abandonou: a sessão aberta é descartada pelo banco (sem pontos) na próxima
-            segundosFoco = 0;
-            
-            // Restaura visual do botão principal
-            btnAcao.innerHTML = '▶ Começar';
-            btnAcao.style.backgroundColor = '#48bb78';
-            
-            // Troca as telas
             telaAndamento.style.display = 'none';
-            telaConfig.style.display = 'block';
-            
-            // Restaura o relógio para o tempo original escolhido
-            const tempoFocoOriginal = document.getElementById('input-foco').value;
-            display.textContent = `${tempoFocoOriginal.padStart(2, '0')}:00`;
+            telaResumo.style.display = 'block';
         });
 
-        // Encerra a sessão e vai para a tela de resumo/pontos (o banco calcula os pontos)
-        btnFinalizar.addEventListener('click', () => {
-            if (!sessaoId) return;
-            pomodoro.pausar();
-            rodando = false;
-            location.href = `conclusao-sessao.html?s=${encodeURIComponent(sessaoId)}&m=${Math.floor(segundosFoco / 60)}`;
+        btnCancelarResumo.addEventListener('click', () => {
+            telaResumo.style.display = 'none';
+            telaAndamento.style.display = 'block';
+        });
+
+        // 4. SALVAR E CONCLUIR
+        btnSalvarSessao.addEventListener('click', () => {
+            const resumo = textoResumo.value.trim();
+            if(!resumo) { alert("Escreva um resumo para ganhar pontos!"); return; }
+
+            // Pega os dados do JS do Deivid
+            const totalSegundos = pomodoro.msFoco ? Math.floor(pomodoro.msFoco / 1000) : 0;
+            const mins = pomodoro.minutosFocados || Math.floor(totalSegundos / 60);
+            
+            // Simulação de pontos: 5 pontos por minuto + 10 por ter resumo
+            const pontosGanhos = (mins * 5) + 10;
+
+            document.getElementById('pontos-display').textContent = `${pontosGanhos} pontos!`;
+            document.getElementById('display-tempo-final').textContent = `${mins} min`;
+
+            bloqueioDeSaida = false; // SESSÃO SALVA, REMOVE A TRAVA
+
+            telaResumo.style.display = 'none';
+            telaConclusao.style.display = 'block';
+        });
+
+        // 5. RESETAR TUDO (Voltar ao inicio)
+        btnNovaSessao.addEventListener('click', () => {
+            textoResumo.value = '';
+            sessaoId = null;
+            telaConclusao.style.display = 'none';
+            telaConfig.style.display = 'block';
+            displayInicial.textContent = `${inputFoco.value.padStart(2, '0')}:00`;
+            displayAtivo.textContent = displayInicial.textContent;
+        });
+
+        // ================= SISTEMA DE SEGURANÇA (BLOQUEIO DE SAÍDA) =================
+
+        // Clicou no botão "Voltar para configurações" no meio do andamento
+        btnDesistir.addEventListener('click', () => {
+            if (bloqueioDeSaida) {
+                linkDestinoPendente = 'RESET'; 
+                modalAviso.style.display = 'flex';
+            }
+        });
+
+        // Clicou em links da barra lateral
+        linksSidebar.forEach(link => {
+            link.addEventListener('click', (e) => {
+                if (bloqueioDeSaida) {
+                    e.preventDefault(); // Impede a navegação
+                    linkDestinoPendente = link.href;
+                    modalAviso.style.display = 'flex';
+                }
+            });
+        });
+
+        // Desistiu de sair
+        btnFicar.addEventListener('click', () => {
+            modalAviso.style.display = 'none';
+            linkDestinoPendente = null;
+        });
+
+        // Confirmou que quer perder o progresso e sair
+        btnConfirmarSaida.addEventListener('click', () => {
+            bloqueioDeSaida = false; 
+            if (linkDestinoPendente === 'RESET') {
+                pomodoro.pausar();
+                rodando = false;
+                sessaoId = null;
+                modalAviso.style.display = 'none';
+                telaAndamento.style.display = 'none';
+                telaConfig.style.display = 'block';
+            } else if (linkDestinoPendente) {
+                window.location.href = linkDestinoPendente; // Redireciona de facto
+            }
+        });
+
+        // Proteção do próprio navegador (se ele apertar F5 ou fechar a aba)
+        window.addEventListener('beforeunload', (e) => {
+            if (bloqueioDeSaida) {
+                e.preventDefault();
+                e.returnValue = ''; 
+            }
         });
     </script>
 </body>
