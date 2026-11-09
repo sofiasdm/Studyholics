@@ -27,7 +27,10 @@
         <a href="perfil.html"><i class="fa-solid fa-user"></i> Perfil</a>
       </nav>
     </div>
-    <div class="groups-sidebar-bottom"><button type="button" id="btn-sair"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button></div>
+    <div class="groups-sidebar-bottom">
+      <a href="editar-perfil.html"><i class="fa-solid fa-gear" aria-hidden="true"></i> Configurações</a>
+      <button type="button" id="btn-sair"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> Sair</button>
+    </div>
   </aside>
 
   <div class="groups-shell">
@@ -39,13 +42,41 @@
       <p id="groups-status" class="groups-status" role="status" hidden></p>
 
       <section id="view-list" class="groups-view">
-        <div class="groups-heading"><div><h1>Grupos de estudo</h1><p>Conecte-se com estudantes, tire dúvidas e evoluam juntos!</p></div></div>
+        <div class="groups-heading">
+          <div class="groups-heading-title">
+            <h1>Grupos de Estudo</h1>
+            <div id="groups-help" class="groups-help">
+              <button id="groups-help-button" class="groups-help-button" type="button" aria-label="Como funcionam os grupos de estudo" aria-describedby="groups-help-text" aria-expanded="false">?</button>
+              <p id="groups-help-text" class="groups-help-tooltip" role="tooltip" hidden>Os grupos de estudo são para quem quer estudar em uma comunidade de studyholics. Possuem chats de mensagens, fóruns de discussão e ranking de estudos semanais. Escolha um para estudar com a galera!</p>
+            </div>
+          </div>
+          <p>Conecte-se com estudantes, tire dúvidas e evoluam juntos!</p>
+        </div>
         <div class="groups-list-layout">
-          <div><h2 class="section-label">Seus grupos</h2><div id="groups-list" class="groups-list"><p class="groups-empty">Carregando grupos…</p></div></div>
+          <section class="groups-mine" aria-labelledby="mine-heading">
+            <h2 id="mine-heading" class="section-label">Seus grupos</h2>
+            <div id="groups-list" class="groups-list"><p class="groups-empty">Carregando grupos…</p></div>
+          </section>
           <div class="groups-action-column">
             <div class="groups-action-card"><i class="fa-solid fa-users-rays" aria-hidden="true"></i><button id="open-create" class="primary-button" type="button">Criar grupo</button></div>
-            <form id="join-form" class="groups-action-card"><i class="fa-solid fa-user-group" aria-hidden="true"></i><label for="join-id">Entrar com a senha de acesso</label><input id="join-id" type="number" min="1" required placeholder="Número do grupo"><input id="join-password" type="password" required placeholder="Senha de acesso"><button class="primary-button" type="submit">Entrar</button></form>
+            <form id="join-form" class="groups-action-card">
+              <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+              <label for="join-name">Entrar com a senha de acesso</label>
+              <div id="join-search" class="join-search">
+                <input id="join-name" type="text" role="combobox" aria-label="Nome do grupo" aria-autocomplete="list" aria-expanded="false" aria-controls="join-options" maxlength="100" autocomplete="off" required placeholder="Nome do grupo">
+                <ul id="join-options" class="join-options" role="listbox" aria-label="Grupos encontrados" hidden></ul>
+              </div>
+              <label class="sr-only" for="join-password">Senha de acesso</label>
+              <input id="join-password" type="password" maxlength="80" autocomplete="off" required placeholder="Senha de acesso">
+              <button class="primary-button" type="submit">Entrar</button>
+              <p id="join-feedback" class="group-form-feedback" role="status"></p>
+            </form>
           </div>
+          <section class="groups-explore" aria-labelledby="explore-heading">
+            <h2 id="explore-heading" class="section-label">Grupos existentes</h2>
+            <div id="explore-list" class="groups-list"><p class="groups-empty">Carregando grupos…</p></div>
+            <button id="explore-more" class="secondary-button explore-more" type="button" hidden>Mostrar mais grupos</button>
+          </section>
         </div>
       </section>
 
@@ -56,7 +87,7 @@
           <label>Nome do grupo<input name="nome" maxlength="100" minlength="3" required placeholder="Ex.: Redes de computadores"></label>
           <label>Descrição<textarea name="descricao" maxlength="500" rows="4" placeholder="Conte sobre os objetivos do grupo e como ele vai estudar."></textarea></label>
           <label>Disciplinas do grupo <small>Separe por vírgulas. Use o mesmo nome no Pomodoro para contar no ranking.</small><input name="disciplinas" maxlength="600" required placeholder="Ex.: Programação 1, Matemática Discreta"></label>
-          <label>Senha de acesso <small>Compartilhe o número do grupo e esta senha com quem quiser convidar.</small><input name="senha" type="password" minlength="6" maxlength="80" required placeholder="Mínimo de 6 caracteres"></label>
+          <label>Senha de acesso <small>Compartilhe o nome do grupo e esta senha com quem quiser convidar.</small><input name="senha" type="password" minlength="6" maxlength="80" required placeholder="Mínimo de 6 caracteres"></label>
           <button class="primary-button" type="submit">Criar grupo</button>
         </form>
       </section>
@@ -64,18 +95,105 @@
       <section id="view-detail" class="groups-view" hidden>
         <button class="back-button" type="button" data-back><i class="fa-solid fa-chevron-left"></i> Voltar aos grupos</button>
         <div class="group-title-row"><div class="group-title"><span class="group-title-icon"><i class="fa-solid fa-users"></i></span><div><h1 id="group-name"></h1><span id="group-count"></span><p id="group-description"></p></div></div><button id="leave-group" class="outline-danger" type="button">Sair do grupo</button></div>
-        <nav class="group-tabs" aria-label="Seções do grupo"><button class="selected" type="button" data-tab="conversas">Conversas</button><button type="button" data-tab="estudos">Estudos</button><button type="button" data-tab="membros">Membros</button><button type="button" data-tab="sobre">Sobre</button></nav>
+        <nav class="group-tabs" aria-label="Seções do grupo"><button class="selected" type="button" data-tab="conversas">Conversas</button><button type="button" data-tab="feed">Feed</button><button type="button" data-tab="estudos">Estudos</button><button type="button" data-tab="membros">Membros</button><button type="button" data-tab="sobre">Sobre</button></nav>
 
         <div id="tab-conversas" class="group-tab-panel"><div class="chat-card"><div class="chat-header"><h2>Conversas do grupo</h2><p>Compartilhe dúvidas, ideias e descobertas com os membros.</p></div><button id="older-messages" class="text-button" type="button" hidden>Carregar mensagens anteriores</button><div id="messages" class="messages" aria-live="polite"></div><form id="message-form" class="message-composer"><label class="sr-only" for="message-text">Sua mensagem</label><textarea id="message-text" maxlength="2000" rows="2" required placeholder="Escreva uma mensagem..."></textarea><button class="primary-button" type="submit" aria-label="Enviar mensagem"><i class="fa-solid fa-paper-plane"></i><span>Enviar</span></button></form></div></div>
 
+        <section id="tab-feed" class="group-tab-panel group-feed" aria-labelledby="feed-heading" hidden>
+          <div class="info-card">
+            <h2 id="feed-heading">Feed do grupo</h2>
+            <p>Publique dúvidas, resumos e materiais para os membros do grupo.</p>
+            <form id="feed-form" class="organizer-form feed-form">
+              <label for="feed-title">Título <small>(opcional)</small></label>
+              <input id="feed-title" name="titulo" maxlength="120" placeholder="Dê um título à publicação">
+              <label for="feed-text">Texto</label>
+              <textarea id="feed-text" name="texto" rows="4" maxlength="4000" placeholder="O que você quer compartilhar?"></textarea>
+              <label for="feed-link">Link <small>(opcional)</small></label>
+              <input id="feed-link" name="link" type="url" maxlength="2048" placeholder="https://">
+              <button class="primary-button" type="submit">Publicar</button>
+              <p id="feed-form-feedback" class="group-form-feedback" role="status"></p>
+            </form>
+          </div>
+          <p id="feed-connection" class="feed-connection" role="status" hidden></p>
+          <p id="feed-list-feedback" class="feed-list-feedback" role="status"></p>
+          <div id="feed-list" class="feed-list"></div>
+          <button id="feed-more" class="secondary-button feed-more" type="button" hidden>Ver publicações anteriores</button>
+        </section>
+
         <div id="tab-estudos" class="group-tab-panel" hidden><div class="study-heading"><div><h2>Estudos da semana</h2><p>Tempo de foco em disciplinas do grupo, de segunda a domingo.</p></div><a id="study-link" class="primary-button link-button" href="pomodoro.html">Começar a estudar</a></div><div id="study-subjects" class="subject-chips"></div><div class="study-grid"><div class="info-card"><h3>Ranking semanal</h3><ol id="study-ranking" class="ranking-list"></ol></div><div class="info-card"><h3>Estudando agora</h3><div id="studying-now"></div></div></div></div>
 
-        <div id="tab-membros" class="group-tab-panel" hidden><div class="members-heading"><h2 id="members-heading">Membros</h2><form id="invite-form" class="invite-form" hidden><label class="sr-only" for="invite-email">E-mail de cadastro</label><input id="invite-email" type="email" required placeholder="E-mail de cadastro"><button class="primary-button" type="submit">Adicionar</button></form></div><div id="members-list" class="members-list"></div></div>
+        <div id="tab-membros" class="group-tab-panel" hidden>
+          <div class="members-heading"><h2 id="members-heading">Membros</h2></div>
+          <form id="invite-form" class="invite-form" hidden>
+            <label for="invite-email">Adicionar membro pelo e-mail de cadastro</label>
+            <div class="invite-fields">
+              <input id="invite-email" name="email" type="email" maxlength="254" autocomplete="off" required placeholder="pessoa@exemplo.com">
+              <button class="primary-button" type="submit">Adicionar membro</button>
+            </div>
+            <p id="invite-feedback" class="group-form-feedback" role="status"></p>
+          </form>
+          <div id="members-list" class="members-list"></div>
+        </div>
 
-        <div id="tab-sobre" class="group-tab-panel" hidden><div class="about-grid"><div class="info-card"><h2>Informações do grupo</h2><dl><div><dt><i class="fa-regular fa-calendar"></i> Criado em</dt><dd id="about-date"></dd></div><div><dt><i class="fa-solid fa-book"></i> Disciplinas</dt><dd id="about-subjects"></dd></div><div><dt><i class="fa-solid fa-hashtag"></i> Número do grupo</dt><dd id="about-id"></dd></div></dl></div><div class="info-card" id="organizer-card" hidden><h2>Organização</h2><label>Senha de acesso<div class="password-row"><input id="group-password" type="password" readonly><button id="show-password" class="secondary-button" type="button">Mostrar</button></div></label><p class="help-text">Compartilhe o número e a senha para novos membros entrarem.</p><form id="subjects-form" class="subjects-form"><label for="edit-subjects">Disciplinas, separadas por vírgula</label><input id="edit-subjects" required maxlength="600"><button class="secondary-button" type="submit">Salvar disciplinas</button></form><button id="delete-group" class="outline-danger" type="button">Excluir grupo</button></div></div></div>
+        <div id="tab-sobre" class="group-tab-panel" hidden>
+          <div class="about-grid">
+            <div class="info-card">
+              <h2>Informações do grupo</h2>
+              <dl>
+                <div class="about-description">
+                  <dt>Descrição</dt>
+                  <dd id="about-description"></dd>
+                </div>
+                <div><dt><i class="fa-regular fa-calendar"></i> Criado em</dt><dd id="about-date"></dd></div>
+                <div><dt><i class="fa-solid fa-book"></i> Disciplinas</dt><dd id="about-subjects"></dd></div>
+              </dl>
+            </div>
+            <div class="info-card" id="organizer-card" hidden>
+              <h2>Organização</h2>
+              <form id="description-form" class="organizer-form">
+                <label for="edit-description">Descrição do grupo</label>
+                <textarea id="edit-description" rows="4" maxlength="500"></textarea>
+                <button class="secondary-button" type="submit">Salvar descrição</button>
+              </form>
+              <label for="group-password">Senha de acesso atual</label>
+              <div class="password-row">
+                <input id="group-password" type="password" readonly>
+                <button id="show-password" class="secondary-button" type="button">Mostrar</button>
+              </div>
+              <form id="password-form" class="organizer-form">
+                <label for="edit-password">Nova senha de acesso</label>
+                <input id="edit-password" type="password" minlength="6" maxlength="80" autocomplete="new-password" required>
+                <p class="help-text">Compartilhe o nome do grupo e a nova senha com quem ainda vai entrar.</p>
+                <button class="secondary-button" type="submit">Alterar senha</button>
+              </form>
+              <form id="subjects-form" class="organizer-form">
+                <label for="edit-subjects">Disciplinas, separadas por vírgula</label>
+                <input id="edit-subjects" required maxlength="600">
+                <button class="secondary-button" type="submit">Salvar disciplinas</button>
+              </form>
+              <button id="delete-group" class="outline-danger" type="button">Excluir grupo</button>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   </div>
-  <nav class="groups-mobile-nav" aria-label="Principal no celular"><a href="pagina-inicial.html"><i class="fa-solid fa-house"></i>Início</a><a href="pomodoro.html"><i class="fa-solid fa-book-open"></i>Estudar</a><a class="active" href="grupos.html"><i class="fa-solid fa-users"></i>Grupos</a><a href="perfil.html"><i class="fa-solid fa-user"></i>Perfil</a></nav>
+  <nav class="groups-mobile-nav" aria-label="Principal no celular"><a href="pagina-inicial.html"><i class="fa-solid fa-house"></i>Início</a><a href="pomodoro.html"><i class="fa-solid fa-book-open"></i>Estudar</a><a class="active" href="grupos.html" aria-current="page"><i class="fa-solid fa-users"></i>Grupos</a><a href="perfil.html"><i class="fa-solid fa-user"></i>Perfil</a></nav>
+  <dialog id="explore-dialog" class="explore-dialog" aria-labelledby="preview-name">
+    <div class="preview-heading">
+      <h2 id="preview-name"></h2>
+      <form method="dialog"><button class="icon-btn" type="submit" aria-label="Fechar detalhes do grupo"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></form>
+    </div>
+    <p id="preview-description"></p>
+    <h3>Disciplinas</h3>
+    <div id="preview-subjects" class="subject-chips"></div>
+    <button id="preview-start" class="primary-button" type="button">Entrar no grupo</button>
+    <form id="preview-form" class="organizer-form" hidden>
+      <label for="preview-password">Senha de acesso</label>
+      <input id="preview-password" type="password" maxlength="80" autocomplete="off" required>
+      <button class="primary-button" type="submit">Confirmar entrada</button>
+      <p id="preview-feedback" class="group-form-feedback" role="status"></p>
+    </form>
+  </dialog>
 </body>
 </html>
