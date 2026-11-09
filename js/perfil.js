@@ -35,7 +35,9 @@ export async function buscarEstatisticas() {
 // Cursos para o <select> (tabela CURSO, leitura liberada no banco)
 export async function buscarCursos() {
   const { data, error } = await supabase.from("curso")
-    .select("id_curso, nome_curso").order("nome_curso");
+    .select("id_curso, nome_curso, duracao_periodos")
+    .eq("ativo", true)
+    .order("nome_curso");
   if (error) throw new Error(error.message);
   return data;
 }

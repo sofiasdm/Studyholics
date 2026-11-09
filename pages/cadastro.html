@@ -44,16 +44,19 @@
         <h1>Dados Acadêmicos</h1>
         <p class="subtitle">Vamos começar com seus dados básicos.</p>
         <div class="fields">
-          <label class="field select icon cap"><span>Curso</span>
-            <select name="course" required>
-              <option value="">Carregando cursos…</option>
+          <label class="field select icon cap"><span>Campus</span>
+            <select name="campus" required>
+              <option value="">Selecione seu campus</option>
             </select>
           </label>
-          <label class="field select icon calendar"><span>Semestre atual</span>
-            <select name="semester" required>
-              <option value="">Selecione seu semestre</option>
-              <option value="1">1º</option><option value="2">2º</option><option value="3">3º</option><option value="4">4º</option><option value="5">5º</option>
-              <option value="6">6º</option><option value="7">7º</option><option value="8">8º</option><option value="9">9º</option><option value="10">10º</option>
+          <label class="field select icon cap"><span>Curso</span>
+            <select name="course" required disabled>
+              <option value="">Selecione o campus primeiro</option>
+            </select>
+          </label>
+          <label class="field select icon calendar"><span>Período atual</span>
+            <select name="semester" required disabled>
+              <option value="">Selecione o curso primeiro</option>
             </select>
           </label>
         </div>

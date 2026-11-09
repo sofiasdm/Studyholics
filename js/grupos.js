@@ -221,6 +221,12 @@ $("join-form").addEventListener("submit", async event => {
   try { await rpc("grupo_entrar", { p_grupo: id, p_senha: $("join-password").value }); form.reset(); await loadList(); await openGroup(id); status("Você entrou no grupo."); }
   catch (e) { error(e); } finally { setBusy(form, false); }
 });
+$("message-text").addEventListener("keydown", event => {
+  if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+    event.preventDefault();               // Shift+Enter continua quebrando linha
+    $("message-form").requestSubmit();    // dispara o mesmo submit do botão (com validação)
+  }
+});
 $("message-form").addEventListener("submit", async event => {
   event.preventDefault(); const form = event.currentTarget;
   const text = $("message-text").value.trim(); if (!text) return;

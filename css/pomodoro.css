@@ -180,3 +180,5 @@ main.main-area {
 .pomodoro-aviso{max-width:900px;margin:10px auto 18px;padding:10px 14px;background:#fff0f0;border:1px solid #e7a1a1;border-radius:9px;color:#a12a2a;font-size:13px;font-weight:800}
 .pomodoro-aviso[data-kind="info"]{background:#e1f5ef;border-color:#9ddcc9;color:#0b1f44}
 .card-falso .textos select,.card-falso .textos input{display:block;width:100%;min-width:140px;border:1px solid #bdcbd5;border-radius:7px;padding:6px 8px;background:#fff;color:#0b1f44;font-size:14px;font-weight:800}
+#disc-outra { margin-top: 6px; }
+#disc-outra[hidden] { display: none; }

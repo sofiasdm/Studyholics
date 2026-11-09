@@ -4,7 +4,7 @@
 import { supabase } from "./supabaseClient.js";
 import { exigirLogin } from "./protecao.js";
 import { buscarPerfil, buscarCursos, enviarFoto, salvarPerfil } from "./perfil.js";
-import { validarPerfil, validarFoto, CAMPI, LIMITES } from "./perfil-util.js";
+import { validarPerfil, validarFoto, CAMPI, CAMPUS_ATIVO, LIMITES } from "./perfil-util.js";
 
 const $ = id => document.getElementById(id);
 const CAMPOS = ["nome", "sobrenome", "curso", "semestre", "campus"];
@@ -12,6 +12,39 @@ const CAMPOS = ["nome", "sobrenome", "curso", "semestre", "campus"];
 let userId = null;
 let arquivoFoto = null;   // foto escolhida e ainda não enviada
 let urlPrevia = null;     // endereço temporário da pré-visualização
+let cursos = [];          // duracao_periodos null = período não se aplica (mestrado)
+
+// ---------- Campus -> Curso -> Período (mesma lógica do cadastro) ----------
+function bloquear(select, texto) {
+  select.replaceChildren(new Option(texto, ""));
+  select.disabled = true;
+}
+const cursoAtual = () => cursos.find(c => String(c.id_curso) === $("curso").value);
+
+// Campus -> Curso: sem campus = pede o campus | outro campus = "Em breve" | Dois Irmãos = cursos
+function atualizarCurso(idCurso = $("curso").value, semestre = $("semestre").value) {
+  const campus = $("campus").value, select = $("curso");
+  if (!campus) bloquear(select, "Selecione o campus primeiro");
+  else if (campus !== CAMPUS_ATIVO) bloquear(select, "Em breve");
+  else {
+    select.replaceChildren(new Option("Selecione seu curso", ""), ...cursos.map(c => new Option(c.nome_curso, c.id_curso)));
+    select.disabled = false;
+    select.value = idCurso == null ? "" : String(idCurso);
+  }
+  atualizarPeriodo(semestre);
+}
+
+// Curso -> Período: BCC = 10 | LCC = 9 | mestrado = "Não se aplica" | outro campus = "Em breve"
+function atualizarPeriodo(semestre = $("semestre").value) {
+  const select = $("semestre"), campus = $("campus").value, curso = cursoAtual();
+  if (campus && campus !== CAMPUS_ATIVO) return bloquear(select, "Em breve");
+  if (!curso) return bloquear(select, "Selecione o curso primeiro");
+  if (curso.duracao_periodos === null) return bloquear(select, "Não se aplica");
+  select.replaceChildren(new Option("Selecione seu período", ""),
+    ...Array.from({ length: curso.duracao_periodos }, (_, i) => new Option(`${i + 1}º`, i + 1)));
+  select.disabled = false;
+  select.value = semestre == null ? "" : String(semestre);
+}
 
 // ---------- Mensagens ----------
 function mostrarStatus(texto, tipo = "ok") {
@@ -70,12 +103,16 @@ async function salvar(e) {
   limparErros();
   limparStatus();
 
+  const emDoisIrmaos = $("campus").value === CAMPUS_ATIVO;
   const v = validarPerfil({
     nome: $("nome").value,
     sobrenome: $("sobrenome").value,
     idCurso: $("curso").value,
     semestre: $("semestre").value,
     campus: $("campus").value,
+    exigeCampus: true,
+    exigeCurso: emDoisIrmaos,
+    exigePeriodo: emDoisIrmaos && cursoAtual()?.duracao_periodos != null,
   });
   if (!v.ok) {
     Object.entries(v.erros).forEach(([campo, msg]) => mostrarErroCampo(campo, msg));
@@ -119,29 +156,30 @@ async function iniciar() {
   $("form-perfil").addEventListener("submit", salvar);
   CAMPOS.forEach(c => $(c).addEventListener("input", () => { mostrarErroCampo(c, ""); limparStatus(); }));
 
-  let perfil, cursos;
+  let perfil, listaCursos;
   try {
-    [perfil, cursos] = await Promise.all([buscarPerfil(userId), buscarCursos()]);
+    [perfil, listaCursos] = await Promise.all([buscarPerfil(userId), buscarCursos()]);
   } catch (err) {
     console.error(err);
     return mostrarStatus("Não foi possível carregar seus dados. " + err.message, "erro");
   }
   if (!perfil) return mostrarStatus("Não encontramos os dados do seu perfil.", "erro");
+  cursos = listaCursos;
 
   $("nome").value = perfil.primeiro_nome ?? "";
   $("sobrenome").value = perfil.sobrenome ?? "";
   $("nome").maxLength = LIMITES.nome;
   $("sobrenome").maxLength = LIMITES.sobrenome;
 
-  preencherSelect($("curso"), cursos.map(c => [c.id_curso, c.nome_curso]), perfil.id_curso);
-  $("curso").options[0].textContent = "Selecione seu curso";
-  preencherSelect($("semestre"), Array.from({ length: 10 }, (_, i) => [i + 1, `${i + 1}º`]), perfil.semestre);
-
   // Se o campus gravado não estiver na lista (ex.: valor antigo), ele aparece mesmo assim
   const campi = perfil.campus && !CAMPI.includes(perfil.campus) ? [...CAMPI, perfil.campus] : CAMPI;
   preencherSelect($("campus"), campi.map(c => [c, c]), perfil.campus);
+  $("campus").options[0].textContent = "Selecione seu campus";
+  $("campus").addEventListener("change", () => atualizarCurso());
+  $("curso").addEventListener("change", () => atualizarPeriodo());
 
   if (perfil.foto_url) mostrarFoto(perfil.foto_url);
-  habilitarFormulario(true);
+  habilitarFormulario(true);                          // habilita tudo...
+  atualizarCurso(perfil.id_curso, perfil.semestre);   // ...e depois aplica as regras de curso/período
 }
 iniciar();
