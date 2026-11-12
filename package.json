@@ -7,6 +7,7 @@
     "node": ">=20.19.0"
   },
   "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
@@ -15,6 +16,7 @@
     "@supabase/supabase-js": "^2.117.3"
   },
   "devDependencies": {
+    "jest": "^30.5.2",
     "vite": "^8.3.0"
   }
 }
