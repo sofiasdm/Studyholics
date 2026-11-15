@@ -1,6 +1,7 @@
 import { supabase } from "./supabaseClient.js";
 import { exigirLogin } from "./protecao.js";
 import { startGroupFeed, stopGroupFeed, refreshGroupFeed } from "./grupos-feed.js";
+import { criarGrupo, convidarPorEmail } from "./grupos-util.js";
 
 const $ = id => document.getElementById(id);
 const state = { userId: null, groups: [], group: null, tab: "conversas", messages: new Map() };
@@ -460,13 +461,16 @@ $("btn-sair").addEventListener("click", async () => { await supabase.auth.signOu
 $("create-form").addEventListener("submit", async event => {
   event.preventDefault(); const form = event.currentTarget;
   const values = new FormData(form);
-  const subjects = [...new Set(String(values.get("disciplinas")).split(",").map(s => s.trim()).filter(Boolean))];
-  if (!subjects.length) { status("Informe ao menos uma disciplina.", "error"); return; }
   setBusy(form, true);
   try {
-    const id = await rpc("grupo_criar", { p_nome: values.get("nome"), p_descricao: values.get("descricao"), p_senha: values.get("senha"), p_disciplinas: subjects });
+    // Validação e chamada ao banco em grupos-util.js (RF11), testadas em tests/rf11-criacao-grupos.test.js
+    const result = await criarGrupo(rpc, {
+      nome: values.get("nome"), descricao: values.get("descricao"),
+      senha: values.get("senha"), disciplinas: values.get("disciplinas")
+    });
+    if (!result.ok) { status(Object.values(result.erros)[0], "error"); return; }
     form.reset();
-    if (await openGroup(id)) status("Grupo criado. Compartilhe o nome e a senha de acesso com os participantes.");
+    if (await openGroup(result.id)) status("Grupo criado. Compartilhe o nome e a senha de acesso com os participantes.");
   } catch (e) { error(e); } finally { setBusy(form, false); }
 });
 $("join-form").addEventListener("submit", async event => {
@@ -537,8 +541,9 @@ $("invite-form").addEventListener("submit", async event => {
   feedback.textContent = "";
   setBusy(form, true);
   try {
-    await rpc("grupo_adicionar_por_email", { p_grupo: groupId, p_email: email });
+    const invite = await convidarPorEmail(rpc, groupId, email);
     if (state.group?.id !== groupId) return;
+    if (!invite.ok) { feedback.textContent = invite.erro; return; }
     form.reset();
     await reloadDetail();
     status("Membro adicionado pelo e-mail de cadastro.");
