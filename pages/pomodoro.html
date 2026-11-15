@@ -78,20 +78,20 @@
 
                     <div class="config-tempos">
                         <div class="input-box">
-                            <label>Pomodoro</label>
-                            <div class="input-box-inner"><input type="number" id="input-foco" value="25" min="1" max="240"></div>
+                            <label>Pomodoro</label>   <!--Limitador de tamanho do pomodoro-->
+                            <div class="input-box-inner"><input type="number" id="input-foco" value="25" min="1" max="60" maxlength="2"></div>
                         </div>
                         <div class="input-box">
                             <label>Pausa curta</label>
-                            <div class="input-box-inner"><input type="number" id="input-pausa-curta" value="5" min="1"></div>
+                            <div class="input-box-inner"><input type="number" id="input-pausa-curta" value="5" min="1" max="60" maxlength="2"></div>
                         </div>
                         <div class="input-box">
                             <label>Pausa longa</label>
-                            <div class="input-box-inner"><input type="number" id="input-pausa-longa" value="10" min="1"></div>
+                            <div class="input-box-inner"><input type="number" id="input-pausa-longa" value="10" min="1" max="60" maxlength="2"></div>
                         </div>
                         <div class="input-box">
                             <label>Intervalo de pausa longa</label>
-                            <div class="input-box-inner"><input type="number" id="input-intervalo" value="4" min="1"></div>
+                            <div class="input-box-inner"><input type="number" id="input-intervalo" value="4" min="1" max="10" maxlength="2"></div>
                         </div>
                     </div>
 
@@ -121,6 +121,7 @@
                         <div class="card-falso">
                             <div class="icone-verde"><i class="fa-solid fa-book-bookmark"></i></div>
                             <div class="textos"><label>Disciplina</label><strong id="disc-nome-ativo">—</strong></div>
+                            <input id="disc-outra" maxlength="100" placeholder="Digite o nome da disciplina" hidden>
                         </div>
                         <div class="card-falso">
                             <div class="icone-verde"><i class="fa-solid fa-book-open"></i></div>

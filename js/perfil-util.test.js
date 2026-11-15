@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   formatarMinutos, rotuloSemestre, textoXp, validarFoto, validarPerfil, MAX_FOTO,
-} from "../js/perfil-util.js";
+} from "./perfil-util.js";
 
 const ok = { nome: "Sofia", sobrenome: "Duarte", idCurso: "1", semestre: "5", campus: "UFRPE - Dois Irmãos" };
 

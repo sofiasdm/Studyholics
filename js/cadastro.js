@@ -44,21 +44,70 @@ $$("form.step").forEach(form => {
 });
 
 // ---------- Cursos (vêm da tabela CURSO) ----------
-async function carregarCursos() {
-  const select = $('select[name="course"]');
-  const { data, error } = await supabase
-    .from("curso")
-    .select("id_curso, nome_curso")
-    .order("nome_curso");
-  if (error) {
-    console.error(error);
-    select.options[0].textContent = "Não foi possível carregar os cursos";
-    return;
-  }
-  select.innerHTML = '<option value="">Selecione seu curso</option>';
-  data.forEach(c => select.append(new Option(c.nome_curso, c.id_curso)));
+// ---------- Campus, curso e período ----------
+const CAMPUS_ATIVO = "UFRPE - Dois Irmãos"; // os outros campi aparecem como "Em breve"
+const CAMPI = [
+  CAMPUS_ATIVO,
+  "UFRPE - Garanhuns (UAG)",
+  "UFRPE - Cabo de Santo Agostinho (UACSA)",
+  "UFRPE - Serra Talhada (UAST)",
+  "UFRPE - Belo Jardim (UABJ)",
+];
+let cursos = []; // duracao_periodos null = período não se aplica (mestrado)
+
+const campoCampus = () => $('select[name="campus"]');
+const campoCurso = () => $('select[name="course"]');
+const campoPeriodo = () => $('select[name="semester"]');
+
+function bloquear(select, texto, exigido = false) {
+  select.replaceChildren(new Option(texto, ""));
+  select.disabled = true;
+  select.required = exigido;
+  setError(select, "");
 }
 
+async function carregarCursos() {
+  const { data, error } = await supabase
+    .from("curso")
+    .select("id_curso, nome_curso, duracao_periodos")
+    .eq("ativo", true)
+    .order("nome_curso");
+  if (error) { console.error(error); bloquear(campoCurso(), "Não foi possível carregar os cursos", true); return; }
+  cursos = data;
+  atualizarCurso();
+}
+
+function carregarCampi() {
+  CAMPI.forEach(nome => campoCampus().append(new Option(nome, nome)));
+}
+
+function atualizarCurso() {
+  const campus = campoCampus().value, select = campoCurso(), anterior = select.value;
+  if (!campus) bloquear(select, "Selecione o campus primeiro", true);
+  else if (campus !== CAMPUS_ATIVO) bloquear(select, "Em breve");
+  else {
+    select.replaceChildren(new Option("Selecione seu curso", ""), ...cursos.map(c => new Option(c.nome_curso, c.id_curso)));
+    select.disabled = false;
+    select.required = true;
+    select.value = anterior;
+  }
+  atualizarPeriodo();
+}
+
+function atualizarPeriodo() {
+  const select = campoPeriodo(), campus = campoCampus().value;
+  const curso = cursos.find(c => String(c.id_curso) === campoCurso().value);
+  if (campus && campus !== CAMPUS_ATIVO) return bloquear(select, "Em breve");
+  if (!curso) return bloquear(select, "Selecione o curso primeiro", true);
+  if (curso.duracao_periodos === null) return bloquear(select, "Não se aplica");
+  select.replaceChildren(new Option("Selecione seu período", ""),
+    ...Array.from({ length: curso.duracao_periodos }, (_, i) => new Option(`${i + 1}º`, i + 1)));
+  select.disabled = false;
+  select.required = true;
+  setError(select, "");
+}
+campoCampus().addEventListener("change", atualizarCurso);
+campoCurso().addEventListener("change", atualizarPeriodo);
 // ---------- Cadastro ----------
 async function cadastrar(form) {
   const etapa1 = new FormData($('form[data-step="1"]'));
@@ -81,8 +130,9 @@ async function cadastrar(form) {
         primeiro_nome: etapa1.get("name").trim(),
         sobrenome: etapa1.get("sobrenome").trim(),
         username,
-        id_curso: Number(etapa2.get("course")),
-        semestre: Number(etapa2.get("semester")),
+        id_curso: etapa2.get("course") ? Number(etapa2.get("course")) : null,
+        semestre: etapa2.get("semester") ? Number(etapa2.get("semester")) : null,
+        campus: etapa2.get("campus"),
       },
     },
   });
@@ -143,5 +193,6 @@ $(".avatar input").addEventListener("change", e => {
 
 // ---------- Início ----------
 ativarMostrarSenha();
+carregarCampi();
 carregarCursos();
 mostrarEtapa(1);

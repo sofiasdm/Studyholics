@@ -2,7 +2,7 @@ import { PomodoroTimer } from "./pomodoro.js";
 import { exigirLogin } from "./protecao.js";
 import { iniciarSessao, finalizarSessao } from "./gamificacao.js";
 import { supabase } from "./supabaseClient.js";
-import { DISCIPLINAS } from "./disciplinas.js";
+import { DISCIPLINAS, OUTRA_DISCIPLINA } from "./disciplinas.js";
 
 const $ = id => document.getElementById(id);
 const tela = { config: $("tela-configuracao"), andamento: $("tela-andamento"), resumo: $("tela-resumo"), conclusao: $("tela-conclusao") };
@@ -11,12 +11,14 @@ let sessionId = null;
 let saving = false;
 let destination = null;
 
+function disciplina() { return $("disc-nome").value === OUTRA_DISCIPLINA ? $("disc-outra").value.trim() : $("disc-nome").value; }
 function show(screen) { Object.entries(tela).forEach(([key, node]) => { node.style.display = key === screen ? "block" : "none"; }); }
 function showNotice(message, kind = "error") { const box = $("pomodoro-aviso"); box.textContent = message; box.dataset.kind = kind; box.hidden = !message; }
 function config() {
   const names = { foco: "input-foco", pausaCurta: "input-pausa-curta", pausaLonga: "input-pausa-longa", intervalosPausaLonga: "input-intervalo" };
   const result = Object.fromEntries(Object.entries(names).map(([key, id]) => [key, Number($(id).value)]));
-  if (Object.values(result).some(n => !Number.isInteger(n) || n < 1) || result.foco > 240) throw new Error("Informe tempos inteiros de 1 a 240 minutos para foco e de pelo menos 1 para pausas.");
+  const invalido = Object.entries(names).some(([key, id]) => !Number.isInteger(result[key]) || result[key] < 1 || result[key] > Number($(id).max));
+  if (invalido) throw new Error("Informe valores inteiros dentro dos limites de cada campo (foco e pausas até 60, intervalo até 10).");
   return result;
 }
 function toggleRunning() {
@@ -39,18 +41,26 @@ async function discard() {
   reset();
 }
 function currentDescription() {
-  $("disc-nome-ativo").textContent = $("disc-nome").value;
+  $("disc-nome-ativo").textContent = disciplina();
   $("disc-conteudo-ativo").textContent = $("disc-conteudo").value.trim() || "Sem conteúdo informado";
 }
+
+// Campos de tempo: só dígitos, no máximo 2, valor máximo 240
+document.querySelectorAll(".config-tempos input").forEach(input => {
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/\D/g, "").slice(0, 2);
+    if (Number(input.value) > Number(input.max)) input.value = input.max;
+  });
+});
 
 $("input-foco").addEventListener("input", () => { const n = Math.max(1, Number($("input-foco").value) || 1); $("timer-display-inicial").textContent = `${String(n).padStart(2, "0")}:00`; });
 $("btn-iniciar-sessao").addEventListener("click", async () => {
   showNotice("");
   const button = $("btn-iniciar-sessao"); button.disabled = true;
   try {
-    if (!$("disc-nome").value) throw new Error("Escolha uma disciplina.");
+    if (!disciplina()) throw new Error($("disc-nome").value === OUTRA_DISCIPLINA ? "Digite o nome da disciplina." : "Escolha uma disciplina.");
     const values = config();
-    sessionId = await iniciarSessao($("disc-nome").value, $("disc-conteudo").value.trim(), values.foco);
+    sessionId = await iniciarSessao(disciplina(), $("disc-conteudo").value.trim(), values.foco);
     clock.resetar(); clock.configurar(values); currentDescription(); clock.iniciar();
     $("btn-pausar-continuar").innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
     show("andamento");
@@ -69,7 +79,7 @@ $("btn-salvar-sessao").addEventListener("click", async () => {
     const result = await finalizarSessao(sessionId, clock.minutosFocados, $("texto-resumo").value.trim() || null);
     $("pontos-display").textContent = `${result.pontos_da_sessao || 0} pontos!`;
     $("display-tempo-final").textContent = `${result.minutos_validos || 0} min`;
-    $("disc-nome-final").textContent = $("disc-nome").value;
+    $("disc-nome-final").textContent = disciplina();
     $("disc-conteudo-final").textContent = $("disc-conteudo").value.trim() || "Sem conteúdo informado";
     sessionId = null;
     show("conclusao"); showNotice("");
@@ -103,9 +113,13 @@ async function init() {
   const options = new Set(DISCIPLINAS);
   const { data, error } = await supabase.rpc("grupo_listar");
   if (!error) data.forEach(g => (g.disciplinas || []).forEach(s => options.add(s)));
-  $("disc-nome").replaceChildren(new Option("Selecione a disciplina", ""), ...[...options].sort((a,b) => a.localeCompare(b,"pt-BR")).map(s => new Option(s,s)));
-  const preselected = new URLSearchParams(location.search).get("disciplina");
-  if (preselected && options.has(preselected)) $("disc-nome").value = preselected;
-  if (error) showNotice("Não foi possível carregar as disciplinas dos grupos. As disciplinas padrão continuam disponíveis.", "info");
+  $("disc-nome").replaceChildren(new Option("Selecione a disciplina", ""),
+    ...[...options].sort((a, b) => a.localeCompare(b, "pt-BR")).map(s => new Option(s, s)),
+    new Option("Outra (Personalizada)", OUTRA_DISCIPLINA));
+  $("disc-nome").addEventListener("change", () => {
+    const outra = $("disc-nome").value === OUTRA_DISCIPLINA;
+    $("disc-outra").hidden = !outra;
+    if (outra) $("disc-outra").focus(); else $("disc-outra").value = "";
+  });
 }
 init();

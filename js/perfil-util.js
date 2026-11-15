@@ -10,15 +10,16 @@ export const TIPOS_FOTO = ["image/jpeg", "image/png", "image/webp"];
 export const MAX_FOTO = 2 * 1024 * 1024;
 
 // Opções do campo Campus. Para incluir outro, basta acrescentar uma linha aqui.
+// O primeiro (CAMPUS_ATIVO) é o único com cursos liberados; os outros mostram "Em breve".
 export const CAMPI = [
-  "UFRPE - Dois Irmãos",
-  "UFRPE - Garanhuns (UAG)",
+  "UFRPE - Dois Irmãos (sede)",
   "UFRPE - Cabo de Santo Agostinho (UACSA)",
   "UFRPE - Serra Talhada (UAST)",
   "UFRPE - Belo Jardim (UABJ)",
 ];
+export const CAMPUS_ATIVO = CAMPI[0];
 
-// Minutos -> "13h 30min" ou "45min"
+// Minutos -> "13h 30min" ou "45min" do exemplo da imagem, para fins de teste 
 export function formatarMinutos(min) {
   const total = Math.max(0, Math.floor(Number(min) || 0));
   const h = Math.floor(total / 60), m = total % 60;
@@ -27,7 +28,7 @@ export function formatarMinutos(min) {
 
 export const rotuloSemestre = n => (n ? `${n}º Semestre` : "Não informado");
 
-// Texto da barra de nível: "350 / 700 pts" ou "1600 pts · nível máximo"
+// Texto da barra de nível: "350 / 700 pts" ou "1600 pts - nível máximo" para fins de este 
 export function textoXp(pontos, proximo) {
   return proximo ? `${pontos} / ${proximo.pontos_minimos} pts` : `${pontos} pts · nível máximo`;
 }
@@ -45,6 +46,8 @@ const limpar = texto => String(texto ?? "").trim().replace(/\s+/g, " ");
 
 // Valida o formulário de edição.
 // Entrada: { nome, sobrenome, idCurso, semestre, campus } (tudo texto, como vem dos campos)
+//          + opcionais: exigeCampus (padrão false), exigeCurso e exigePeriodo (padrão true).
+//          Use exigeCurso/exigePeriodo = false quando o campo está desabilitado ("Em breve" / "Não se aplica").
 // Saída:   { ok, erros: { campo: mensagem }, valores } — valores já nos nomes/tipos das colunas.
 export function validarPerfil(entrada) {
   const erros = {};
@@ -53,6 +56,7 @@ export function validarPerfil(entrada) {
   const campus = limpar(entrada.campus);
   const idCurso = Number(entrada.idCurso);
   const semestre = Number(entrada.semestre);
+  const { exigeCampus = false, exigeCurso = true, exigePeriodo = true } = entrada;
 
   if (!nome) erros.nome = "Informe seu nome.";
   else if (nome.length > LIMITES.nome) erros.nome = `Use no máximo ${LIMITES.nome} caracteres.`;
@@ -60,10 +64,12 @@ export function validarPerfil(entrada) {
   if (!sobrenome) erros.sobrenome = "Informe seu sobrenome.";
   else if (sobrenome.length > LIMITES.sobrenome) erros.sobrenome = `Use no máximo ${LIMITES.sobrenome} caracteres.`;
 
-  if (!entrada.idCurso || !Number.isInteger(idCurso) || idCurso < 1) erros.curso = "Selecione seu curso.";
+  if (exigeCampus && !campus) erros.campus = "Selecione seu campus.";
 
-  if (!entrada.semestre || !Number.isInteger(semestre) || semestre < 1 || semestre > 10)
-    erros.semestre = "Selecione seu semestre.";
+  if (exigeCurso && (!entrada.idCurso || !Number.isInteger(idCurso) || idCurso < 1)) erros.curso = "Selecione seu curso.";
+
+  if (exigePeriodo && (!entrada.semestre || !Number.isInteger(semestre) || semestre < 1 || semestre > 10))
+    erros.semestre = "Selecione seu período.";
 
   if (campus.length > LIMITES.campus) erros.campus = `Use no máximo ${LIMITES.campus} caracteres.`;
 
@@ -73,8 +79,8 @@ export function validarPerfil(entrada) {
     valores: {
       primeiro_nome: nome,
       sobrenome,
-      id_curso: idCurso,
-      semestre,
+      id_curso: entrada.idCurso ? idCurso : null,   // vazio = campo desabilitado ("Em breve" / "Não se aplica")
+      semestre: entrada.semestre ? semestre : null,
       campus: campus || null, // vazio = "não informado"
     },
   };

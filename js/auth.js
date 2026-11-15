@@ -37,7 +37,8 @@ const messages = {
   name: "Informe seu nome.",
   sobrenome: "Informe seu sobrenome.",
   course: "Selecione seu curso.",
-  semester: "Selecione seu semestre.",
+  semester: "Selecione seu período.",
+  campus: "Selecione seu campus.",
   username: "Informe seu nome de usuário.",
 };
 
