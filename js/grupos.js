@@ -3,6 +3,7 @@ import { exigirLogin } from "./protecao.js";
 import { startGroupFeed, stopGroupFeed, refreshGroupFeed, prepareSummaryDraft } from "./grupos-feed.js";
 import { groupAttachment, removeUnusedGroupFile, setGroupAvatar, uploadGroupFile } from "./grupos-midia.js";
 import { participantLink } from "./grupos-perfis.js";
+import { criarGrupo } from "./grupos-util.js";
 
 const $ = id => document.getElementById(id);
 const state = { userId: null, groups: [], group: null, tab: "conversas", messages: new Map() };
@@ -268,11 +269,6 @@ function renderDetail(resetForms = false) {
   $("about-subjects").textContent = g.disciplinas.join(", ") || "Nenhuma";
   $("leave-group").hidden = g.criador === state.userId;
   $("organizer-card").hidden = !g.sou_organizador;
-  $("invite-form").hidden = !g.sou_organizador;
-  if (resetForms || !g.sou_organizador) {
-    $("invite-form").reset();
-    $("invite-feedback").textContent = "";
-  }
   $("delete-group").hidden = g.criador !== state.userId;
   $("group-password").value = g.senha || "";
   for (const [id, value] of [["edit-description", g.descricao || ""], ["edit-subjects", g.disciplinas.join(", ")]]) {
@@ -638,27 +634,6 @@ $("group-photo-form").addEventListener("submit", async event => {
   } catch (e) {
     if (state.group?.id === groupId) feedback.textContent = e.message;
     await removeUnusedGroupFile(path);
-  } finally {
-    setBusy(form, false);
-  }
-});
-$("invite-form").addEventListener("submit", async event => {
-  event.preventDefault();
-  const form = event.currentTarget;
-  const groupId = state.group.id;
-  const email = $("invite-email").value.trim();
-  const feedback = $("invite-feedback");
-  feedback.textContent = "";
-  setBusy(form, true);
-  try {
-    const invite = await convidarPorEmail(rpc, groupId, email);
-    if (state.group?.id !== groupId) return;
-    if (!invite.ok) { feedback.textContent = invite.erro; return; }
-    form.reset();
-    await reloadDetail();
-    status("Membro adicionado pelo e-mail de cadastro.");
-  } catch (e) {
-    if (state.group?.id === groupId) feedback.textContent = e.message;
   } finally {
     setBusy(form, false);
   }

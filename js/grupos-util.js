@@ -1,7 +1,7 @@
 // js/grupos-util.js
-// RF11 – Criação de grupos: o estudante pode criar grupos de estudo e convidar outros usuários.
+// RF11 – Criação de grupos de estudo.
 //
-// Lógica da criação e do convite SEM DOM e SEM importar o Supabase, por isso testável em Node.
+// Lógica da criação SEM DOM e SEM importar o Supabase, por isso testável em Node.
 // As regras de validação são as MESMAS da função grupo_criar do banco
 // (supabase/migrations/202611080001_grupos.sql): o front barra o erro antes, o banco continua
 // sendo a palavra final. As funções que falam com o servidor recebem o `rpc` como parâmetro
@@ -13,9 +13,6 @@ export const LIMITES_GRUPO = {
   senhaMin: 6, senhaMax: 80,
   disciplinaMax: 100,
 };
-
-const FORMATO_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const EMAIL_MAX = 254; // mesmo maxlength do campo no HTML
 
 // O Postgres conta caracteres (char_length); [...texto] conta igual, inclusive com emoji.
 const tamanho = texto => [...texto].length;
@@ -63,21 +60,4 @@ export async function criarGrupo(rpc, entrada) {
   if (!validacao.ok) return { ok: false, erros: validacao.erros };
   const id = await rpc("grupo_criar", validacao.valores);
   return { ok: true, id };
-}
-
-// Devolve { ok: true, valor } (e-mail já sem espaços nas pontas) ou { ok: false, erro }.
-export function validarEmailConvite(email) {
-  const valor = String(email ?? "").trim();
-  if (!valor) return { ok: false, erro: "Informe o e-mail do estudante." };
-  if (valor.length > EMAIL_MAX || !FORMATO_EMAIL.test(valor)) return { ok: false, erro: "Informe um e-mail válido." };
-  return { ok: true, valor };
-}
-
-// Convida (adiciona) um usuário já cadastrado ao grupo, pelo e-mail de cadastro.
-// Quem decide se pode convidar (organizador) e se o e-mail existe é o banco: o erro dele sobe.
-export async function convidarPorEmail(rpc, idGrupo, email) {
-  const validacao = validarEmailConvite(email);
-  if (!validacao.ok) return { ok: false, erro: validacao.erro };
-  await rpc("grupo_adicionar_por_email", { p_grupo: idGrupo, p_email: validacao.valor });
-  return { ok: true };
 }

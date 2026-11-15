@@ -186,23 +186,6 @@
 .organizer-form .help-text { margin: 0; }
 .groups-app button:disabled { opacity: .65; cursor: wait; }
 
-.invite-form {
-  display: grid;
-  gap: 8px;
-  max-width: 520px;
-  margin-bottom: 18px;
-}
-.invite-form label { font-size: 13px; font-weight: 900; }
-.invite-fields { display: flex; flex-wrap: wrap; gap: 8px; }
-.invite-fields input {
-  flex: 1 1 190px;
-  min-width: 0;
-  padding: 9px 11px;
-  border: 1px solid #c4d4df;
-  border-radius: 9px;
-  background: #f8fbfe;
-  color: var(--group-navy);
-}
 .group-feed {
   display: grid;
   gap: 14px;
