@@ -1,6 +1,8 @@
 import { supabase } from "./supabaseClient.js";
 import { exigirLogin } from "./protecao.js";
 import { startGroupFeed, stopGroupFeed, refreshGroupFeed } from "./grupos-feed.js";
+import { groupAttachment, removeUnusedGroupFile, setGroupAvatar, uploadGroupFile } from "./grupos-midia.js";
+import { participantLink } from "./grupos-perfis.js";
 
 const $ = id => document.getElementById(id);
 const state = { userId: null, groups: [], group: null, tab: "conversas", messages: new Map() };
@@ -25,6 +27,7 @@ async function rpc(name, args = {}) {
   }
   return data;
 }
+
 function status(message, kind = "success") {
   const el = $("groups-status");
   el.textContent = message;
@@ -67,8 +70,8 @@ function renderList() {
 function groupCard(group, onClick) {
   const button = el("button", "group-list-item");
   button.type = "button";
-  const icon = el("i", "fa-solid fa-users group-list-icon");
-  icon.setAttribute("aria-hidden", "true");
+  const icon = el("span", "group-list-icon");
+  setGroupAvatar(icon, group.foto_grupo);
   const copy = el("div", "group-list-copy");
   copy.append(el("strong", "", group.nome));
   if (group.membros != null) {
@@ -136,6 +139,7 @@ async function loadDirectory(before = null) {
 
 function openPreview(group) {
   previewGroup = group;
+  setGroupAvatar($("preview-avatar"), group.foto_grupo);
   $("preview-name").textContent = group.nome;
   $("preview-description").textContent = group.descricao || "Sem descrição.";
   $("preview-subjects").replaceChildren(...(group.disciplinas.length
@@ -244,13 +248,18 @@ function selectTab(tab) {
     button.setAttribute("aria-current", selected ? "page" : "false");
   });
   for (const name of ["conversas", "feed", "estudos", "membros", "sobre"]) $(`tab-${name}`).hidden = name !== tab;
-  if (tab === "feed") startGroupFeed(state.group.id);
+  if (tab === "feed") startGroupFeed(state.group.id, groupParticipant);
   if (tab === "estudos") refreshStudy().catch(error);
   if (tab === "membros" || tab === "sobre") reloadDetail().catch(error);
 }
 
 function renderDetail(resetForms = false) {
   const g = state.group;
+  const groupAvatar = $("group-avatar");
+  if (resetForms || groupAvatar.dataset.path !== (g.foto_grupo || "")) {
+    setGroupAvatar(groupAvatar, g.foto_grupo);
+    groupAvatar.dataset.path = g.foto_grupo || "";
+  }
   $("group-name").textContent = g.nome;
   $("group-count").textContent = `${g.membros.length} ${g.membros.length === 1 ? "membro" : "membros"}`;
   $("group-description").textContent = g.descricao || "Grupo de estudo";
@@ -271,7 +280,11 @@ function renderDetail(resetForms = false) {
     if (resetForms || field.value === field.defaultValue) field.value = value;
     field.defaultValue = value;
   }
-  if (resetForms || !g.sou_organizador) $("password-form").reset();
+  if (resetForms || !g.sou_organizador) {
+    $("password-form").reset();
+    $("group-photo-form").reset();
+    $("group-photo-feedback").textContent = "";
+  }
   $("group-password").type = "password";
   $("show-password").textContent = "Mostrar";
   $("members-heading").textContent = `Membros (${g.membros.length})`;
@@ -283,11 +296,10 @@ function renderMembers() {
   const g = state.group;
   $("members-list").replaceChildren(...g.membros.map(m => {
     const row = el("div", "member-row");
-    const avatar = el("span", "person-avatar");
-    avatar.append(el("i", "fa-solid fa-user"));
     const copy = el("div", "member-copy");
-    copy.append(el("strong", "", m.nome || "Estudante"), el("small", "", m.id === g.criador ? "Criador · Organizador" : m.organizador ? "Organizador" : "Membro"));
-    row.append(avatar, copy);
+    copy.append(groupParticipant(m.id, m.nome || "Estudante", false));
+    copy.append(el("small", "member-role", m.id === g.criador ? "Criador · Organizador" : m.organizador ? "Organizador" : "Membro"));
+    row.append(copy);
     if (m.id !== g.criador && m.id !== state.userId && g.sou_organizador) {
       const actions = el("div", "member-actions");
       if (g.criador === state.userId) {
@@ -310,17 +322,59 @@ function renderMembers() {
   }));
 }
 
+function groupParticipant(userId, name, labelSelf = true) {
+  const own = userId === state.userId;
+  const photo = state.group.membros.find(member => member.id === userId)?.foto_url;
+  return participantLink(state.group.id, userId, own && labelSelf ? "Você" : name, photo, own);
+}
+
+function messageBody(message) {
+  const body = el("div", "message-bubble");
+  const characters = Array.from(message);
+  const text = el("span", "", message);
+  body.append(text);
+  if (characters.length <= 300) return body;
+
+  const short = characters.slice(0, 300).join("") + "…";
+  const toggle = el("button", "message-toggle", "Ver mais");
+  toggle.type = "button";
+  toggle.setAttribute("aria-expanded", "false");
+  text.textContent = short;
+  toggle.addEventListener("click", () => {
+    const expanded = toggle.getAttribute("aria-expanded") !== "true";
+    text.textContent = expanded ? message : short;
+    toggle.textContent = expanded ? "Ver menos" : "Ver mais";
+    toggle.setAttribute("aria-expanded", String(expanded));
+  });
+  body.append(toggle);
+  return body;
+}
+
 function renderMessages() {
   const box = $("messages");
   const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
   const messages = [...state.messages.values()].sort((a, b) => a.id - b.id);
   if (!messages.length) { box.replaceChildren(el("p", "message-empty", "Ainda não há mensagens. Inicie a conversa!")); return; }
-  box.replaceChildren(...messages.map(m => {
+  box.querySelector(".message-empty")?.remove();
+  const existing = new Map(Array.from(box.children, node => [node.dataset.messageId, node]));
+  let next = null;
+  for (const m of messages.reverse()) {
+    const key = String(m.id);
+    if (existing.has(key)) {
+      next = existing.get(key);
+      continue;
+    }
     const own = m.id_usuario === state.userId;
     const item = el("article", `message${own ? " own" : ""}`);
-    item.append(el("div", "message-meta", `${own ? "Você" : m.nome} · ${dateTime.format(new Date(m.criada_em))}`), el("div", "message-bubble", m.texto));
-    return item;
-  }));
+    item.dataset.messageId = key;
+    const meta = el("div", "message-meta");
+    meta.append(groupParticipant(m.id_usuario, m.nome), el("span", "", dateTime.format(new Date(m.criada_em))));
+    item.append(meta);
+    if (m.texto) item.append(messageBody(m.texto));
+    if (m.midia) item.append(groupAttachment(m.midia, m.midia_tipo));
+    box.insertBefore(item, next);
+    next = item;
+  }
   if (nearBottom) box.scrollTop = box.scrollHeight;
 }
 async function refreshMessages(older = false) {
@@ -366,6 +420,9 @@ async function openGroup(id) {
     stopGroupFeed();
     state.group = group;
     state.messages.clear();
+    $("messages").replaceChildren();
+    $("message-form").reset();
+    $("older-messages").hidden = true;
     renderDetail(true);
     show("detail");
     selectTab("conversas");
@@ -410,6 +467,12 @@ document.addEventListener("keydown", event => {
 });
 
 $("busca-grupos").addEventListener("input", renderList);
+for (const field of document.querySelectorAll(".group-pin")) {
+  field.addEventListener("input", () => {
+    const digits = field.value.replace(/[^0-9]/g, "");
+    if (field.value !== digits) field.value = digits;
+  });
+}
 $("open-create").addEventListener("click", () => show("create"));
 $("explore-more").addEventListener("click", () => loadDirectory(directoryCursor));
 $("join-name").addEventListener("input", () => {
@@ -516,11 +579,59 @@ $("preview-form").addEventListener("submit", async event => {
   if (await openGroup(group.id)) status("Você entrou no grupo.");
 });
 $("message-form").addEventListener("submit", async event => {
-  event.preventDefault(); const form = event.currentTarget;
-  const text = $("message-text").value.trim(); if (!text) return;
+  event.preventDefault();
+  const form = event.currentTarget;
+  const groupId = state.group.id;
+  const text = $("message-text").value.trim();
+  const file = $("message-media").files[0];
+  if (!text && !file) {
+    status("Escreva uma mensagem ou anexe uma mídia.", "error");
+    return;
+  }
   setBusy(form, true);
-  try { await rpc("grupo_enviar_mensagem", { p_grupo: state.group.id, p_texto: text }); $("message-text").value = ""; await refreshMessages(); $("messages").scrollTop = $("messages").scrollHeight; }
-  catch (e) { error(e); } finally { setBusy(form, false); }
+  let path = null;
+  try {
+    if (file) path = await uploadGroupFile(groupId, file);
+    await rpc("grupo_enviar_mensagem_com_midia", { p_grupo: groupId, p_texto: text, p_midia: path });
+    path = null;
+    if (state.group?.id !== groupId) return;
+    form.reset();
+    await refreshMessages();
+    if (state.group?.id === groupId) $("messages").scrollTop = $("messages").scrollHeight;
+  } catch (e) {
+    if (state.group?.id === groupId) error(e);
+    await removeUnusedGroupFile(path);
+  } finally {
+    setBusy(form, false);
+  }
+});
+$("group-photo-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const feedback = $("group-photo-feedback");
+  const groupId = state.group.id;
+  const previous = state.group.foto_grupo;
+  const file = $("group-photo").files[0];
+  if (!file) return;
+  setBusy(form, true);
+  feedback.textContent = "";
+  let path = null;
+  try {
+    path = await uploadGroupFile(groupId, file, "avatar");
+    await rpc("grupo_salvar_foto", { p_grupo: groupId, p_caminho: path });
+    path = null;
+    if (state.group?.id === groupId) {
+      form.reset();
+      await reloadDetail();
+      status("Foto do grupo atualizada.");
+    }
+    await removeUnusedGroupFile(previous);
+  } catch (e) {
+    if (state.group?.id === groupId) feedback.textContent = e.message;
+    await removeUnusedGroupFile(path);
+  } finally {
+    setBusy(form, false);
+  }
 });
 $("invite-form").addEventListener("submit", async event => {
   event.preventDefault();

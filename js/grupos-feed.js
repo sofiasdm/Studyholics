@@ -1,4 +1,5 @@
 import { supabase } from "./supabaseClient.js";
+import { groupAttachment, removeUnusedGroupFile, uploadGroupFile } from "./grupos-midia.js";
 
 const PAGE_SIZE = 20;
 const $ = id => document.getElementById(id);
@@ -132,24 +133,24 @@ async function loadTimeline(feed, target, older = false) {
   }
 }
 
-function authorLine(row) {
+function authorLine(feed, row) {
   const date = new Date(row.criada_em);
   const line = element("div", "feed-meta");
   const time = element("time", "", dateTime.format(date));
   time.dateTime = date.toISOString();
-  line.append(element("strong", "", row.autor), time);
+  line.append(feed.participant(row.id_autor, row.autor), time);
   return line;
 }
 
-function renderComment(row) {
+function renderComment(feed, row) {
   const comment = element("article", "feed-comment");
-  comment.append(authorLine(row), element("p", "feed-body", row.texto));
+  comment.append(authorLine(feed, row), element("p", "feed-body", row.texto));
   return comment;
 }
 
 function renderPost(feed, row) {
   const post = element("article", "info-card feed-post");
-  post.append(authorLine(row));
+  post.append(authorLine(feed, row));
   if (row.titulo) post.append(element("h3", "feed-title", row.titulo));
   if (row.texto) post.append(element("p", "feed-body", row.texto));
   const href = safeLink(row.link);
@@ -160,6 +161,7 @@ function renderPost(feed, row) {
     link.rel = "noopener noreferrer";
     post.append(link);
   }
+  if (row.midia) post.append(groupAttachment(row.midia, row.midia_tipo));
 
   const thread = element("details", "feed-thread");
   const summary = element("summary", "", "Comentários");
@@ -171,7 +173,8 @@ function renderPost(feed, row) {
   more.type = "button";
   more.hidden = true;
   const comments = timeline({
-    table: "grupo_comentario", postId: row.id, list, feedback, more, moreLabel, render: renderComment,
+    table: "grupo_comentario", postId: row.id, list, feedback, more, moreLabel,
+    render: comment => renderComment(feed, comment),
     emptyText: "Ainda não há comentários.", errorText: "Não foi possível carregar os comentários."
   });
   feed.threads.set(String(row.id), { thread, comments });
@@ -179,7 +182,7 @@ function renderPost(feed, row) {
   const form = element("form", "organizer-form feed-comment-form");
   const text = element("textarea");
   text.rows = 2;
-  text.maxLength = 2000;
+  text.maxLength = 500;
   text.required = true;
   text.placeholder = "Escreva um comentário…";
   text.setAttribute("aria-label", "Seu comentário");
@@ -242,13 +245,13 @@ export function stopGroupFeed() {
   setBusy($("feed-form"), false);
 }
 
-export function startGroupFeed(groupId) {
+export function startGroupFeed(groupId, participant) {
   if (activeFeed?.groupId === groupId) {
     refreshGroupFeed(true);
     return;
   }
   stopGroupFeed();
-  const feed = { groupId, threads: new Map(), connected: false };
+  const feed = { groupId, participant, threads: new Map(), connected: false };
   feed.posts = timeline({
     table: "grupo_postagem", list: $("feed-list"), feedback: $("feed-list-feedback"), more: $("feed-more"),
     moreLabel: "Ver publicações anteriores", render: row => renderPost(feed, row),
@@ -292,25 +295,32 @@ $("feed-form").addEventListener("submit", async event => {
   const titulo = fields.get("titulo").trim();
   const texto = fields.get("texto").trim();
   const link = fields.get("link").trim();
+  const file = fields.get("midia");
   const url = link ? safeLink(link) : null;
   const feedback = $("feed-form-feedback");
   if (link && !url) {
     feedback.textContent = "Informe um link que comece com https:// ou http://.";
     return;
   }
-  if (!texto && !link) {
-    feedback.textContent = "Escreva um texto ou informe um link para publicar.";
+  if (!texto && !link && !file.size) {
+    feedback.textContent = "Escreva um texto, informe um link ou anexe uma mídia.";
     return;
   }
   feedback.textContent = "";
   setBusy(form, true);
+  let path = null;
   try {
-    const post = await save("grupo_publicar", { p_grupo: feed.groupId, p_titulo: titulo, p_texto: texto, p_link: url ?? "" });
+    if (file.size) path = await uploadGroupFile(feed.groupId, file);
+    const post = await save("grupo_publicar_com_midia", {
+      p_grupo: feed.groupId, p_titulo: titulo, p_texto: texto, p_link: url ?? "", p_midia: path
+    });
+    path = null;
     if (activeFeed !== feed) return;
     addRows(feed.posts, [post]);
     form.reset();
   } catch (error) {
     if (activeFeed === feed) feedback.textContent = error.message;
+    await removeUnusedGroupFile(path);
   } finally {
     if (activeFeed === feed) setBusy(form, false);
   }
