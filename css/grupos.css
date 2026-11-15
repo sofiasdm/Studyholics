@@ -223,6 +223,7 @@
 .feed-meta strong { color: var(--group-navy); }
 .feed-post .feed-title { margin: 9px 0 0; font-size: 17px; }
 .feed-body { margin-top: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.feed-summary-draft{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;margin-top:14px;border:1px solid #a9ded0;border-radius:9px;background:#e2f7ef;color:#0b1f44;font-size:12px;font-weight:800}.feed-summary-draft button{flex:none}.feed-summary-card{margin-top:12px;border:1px solid #b7dfd3;border-radius:10px;background:#f0faf6;padding:12px 15px}.feed-summary-card summary{color:#126d60;font-size:13px;font-weight:900;cursor:pointer;overflow-wrap:anywhere}.feed-summary-card[open] summary{margin-bottom:12px}.feed-summary-text{white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;font-size:13px;line-height:1.6;margin:0}.feed-summary-download{display:inline-block;margin-top:12px;color:#126d60;font-size:12px;font-weight:900;text-decoration:underline}.feed-summary-card:focus-within{outline:2px solid #44bba4}
 .feed-link {
   display: block;
   margin-top: 8px;

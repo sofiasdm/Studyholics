@@ -4,37 +4,26 @@
 import { supabase } from "./supabaseClient.js";
 import { exigirLogin } from "./protecao.js";
 import { carregarPainel } from "./gamificacao.js";
+import { FUSO_ESTUDOS, chaveLocal, minutosDaSemana, somarDias } from "./estudo-datas.js";
 
-const FUSO = "America/Sao_Paulo";
 const META_SEMANAL_MIN = 360; // 6h. O banco ainda não guarda meta, então fica aqui.
 
 const $ = id => document.getElementById(id);
-const fmtChave = new Intl.DateTimeFormat("en-CA", { timeZone: FUSO }); // AAAA-MM-DD
-const fmtData = new Intl.DateTimeFormat("pt-BR", { timeZone: FUSO, day: "numeric", month: "short", year: "numeric" });
+const fmtData = new Intl.DateTimeFormat("pt-BR", { timeZone: FUSO_ESTUDOS, day: "numeric", month: "short", year: "numeric" });
 
-const chaveDoDia = data => fmtChave.format(new Date(data));
-const DIA_MS = 86400000;
+const chaveDoDia = chaveLocal;
 
 function formatarMinutos(min) {
   const h = Math.floor(min / 60), m = min % 60;
   return h > 0 ? `${h}h ${m}min` : `${m}min`;
 }
 
-// Chaves AAAA-MM-DD de segunda a domingo da semana atual (fuso de São Paulo)
-function semanaAtual() {
-  const [a, m, d] = chaveDoDia(new Date()).split("-").map(Number);
-  const hoje = Date.UTC(a, m - 1, d);
-  const segunda = hoje - ((new Date(hoje).getUTCDay() + 6) % 7) * DIA_MS;
-  return Array.from({ length: 7 }, (_, i) => new Date(segunda + i * DIA_MS).toISOString().slice(0, 10));
-}
-
 function rotuloData(finalizadaEm) {
   const chave = chaveDoDia(finalizadaEm);
-  const [a, m, d] = chaveDoDia(new Date()).split("-").map(Number);
-  const hoje = Date.UTC(a, m - 1, d);
-  const ontem = new Date(hoje - DIA_MS).toISOString().slice(0, 10);
+  const hoje = chaveDoDia(new Date());
+  const ontem = somarDias(hoje, -1);
   const data = fmtData.format(new Date(finalizadaEm));
-  if (chave === new Date(hoje).toISOString().slice(0, 10)) return `Hoje, ${data}`;
+  if (chave === hoje) return `Hoje, ${data}`;
   if (chave === ontem) return `Ontem, ${data}`;
   return data;
 }
@@ -58,16 +47,11 @@ function renderPainel(painel) {
 function renderHoras(sessoes) {
   const total = sessoes.reduce((soma, s) => soma + (s.minutos_validos ?? 0), 0);
   $("horas-total").textContent = formatarMinutos(total);
+  $("sessoes-total").textContent = String(sessoes.length);
 }
 
 function renderSemana(sessoes) {
-  const dias = semanaAtual();
-  const porDia = Object.fromEntries(dias.map(d => [d, 0]));
-  for (const s of sessoes) {
-    const k = chaveDoDia(s.finalizada_em);
-    if (k in porDia) porDia[k] += s.minutos_validos ?? 0;
-  }
-  const minutos = dias.map(d => porDia[d]);
+  const { minutes: minutos } = minutosDaSemana(sessoes, new Date());
   const totalSemana = minutos.reduce((a, b) => a + b, 0);
 
   $("meta-texto").textContent = `${formatarMinutos(totalSemana)} de ${META_SEMANAL_MIN / 60}h da meta semanal`;
@@ -84,6 +68,12 @@ function renderSemana(sessoes) {
     const alvo = min > 0 ? Math.max(10, Math.round((min / escala) * 100)) : 8;
     setTimeout(() => (barra.style.height = `${alvo}%`), 100);
   });
+}
+
+function renderOfensiva(value) {
+  const days = Number(value) || 0;
+  $("home-streak-count").textContent = days;
+  $("home-streak-label").textContent = days === 1 ? "dia seguido estudando" : "dias seguidos estudando";
 }
 
 function itemSessao(s) {
@@ -129,13 +119,19 @@ async function buscarNome(userId) {
 }
 
 async function buscarSessoes() {
-  const { data, error } = await supabase.from("gam_sessao")
-    .select("disciplina, conteudo, finalizada_em, minutos_validos")
-    .not("finalizada_em", "is", null)
-    .order("finalizada_em", { ascending: false })
-    .limit(1000);
-  if (error) throw new Error(error.message);
-  return data;
+  const sessoes = [];
+  const pageSize = 500;
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await supabase.from("gam_sessao")
+      .select("disciplina, conteudo, finalizada_em, minutos_validos")
+      .not("finalizada_em", "is", null)
+      .order("finalizada_em", { ascending: false })
+      .order("id", { ascending: false })
+      .range(offset, offset + pageSize - 1);
+    if (error) throw new Error(error.message);
+    sessoes.push(...data);
+    if (data.length < pageSize) return sessoes;
+  }
 }
 
 async function sair() {
@@ -143,15 +139,43 @@ async function sair() {
   window.location.href = "../index.html";
 }
 
+let atualizando = false;
+async function atualizarIndicadores() {
+  if (atualizando) return;
+  atualizando = true;
+  try {
+    const [painel, sessoes, ofensiva] = await Promise.allSettled([
+      carregarPainel(), buscarSessoes(),
+      supabase.rpc("gam_ofensiva").then(({ data, error }) => {
+        if (error) throw new Error(error.message);
+        return data;
+      })
+    ]);
+    if (painel.status === "fulfilled") renderPainel(painel.value);
+    if (sessoes.status === "fulfilled") {
+      renderHoras(sessoes.value);
+      renderSemana(sessoes.value);
+      renderUltimas(sessoes.value);
+    }
+    if (ofensiva.status === "fulfilled") renderOfensiva(ofensiva.value);
+  } finally {
+    atualizando = false;
+  }
+}
+
 async function iniciar() {
   if (!(await exigirLogin())) return;
   $("btn-sair").addEventListener("click", e => { e.preventDefault(); sair(); });
 
   const { data: { session } } = await supabase.auth.getSession();
-  const [nome, painel, sessoes] = await Promise.allSettled([
+  const [nome, painel, sessoes, ofensiva] = await Promise.allSettled([
     session ? buscarNome(session.user.id) : null,
     carregarPainel(),
     buscarSessoes(),
+    supabase.rpc("gam_ofensiva").then(({ data, error }) => {
+      if (error) throw new Error(error.message);
+      return data;
+    }),
   ]);
 
   renderNome(nome.status === "fulfilled" ? nome.value : null);
@@ -164,6 +188,20 @@ async function iniciar() {
     renderUltimas(sessoes.value);
   } else {
     mostrarErro("Não foi possível carregar suas sessões. " + sessoes.reason.message);
+  }
+  if (ofensiva.status === "fulfilled") renderOfensiva(ofensiva.value);
+  else $("home-streak-count").textContent = "—";
+
+  if (session) {
+    supabase.channel(`home-sessoes-${session.user.id}`)
+      .on("postgres_changes", {
+        event: "*", schema: "public", table: "gam_sessao", filter: `id_usuario=eq.${session.user.id}`
+      }, atualizarIndicadores)
+      .subscribe();
+    setInterval(() => { if (!document.hidden) atualizarIndicadores(); }, 60000);
+    document.addEventListener?.("visibilitychange", () => {
+      if (!document.hidden) atualizarIndicadores();
+    });
   }
 }
 iniciar();

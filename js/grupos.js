@@ -1,6 +1,6 @@
 import { supabase } from "./supabaseClient.js";
 import { exigirLogin } from "./protecao.js";
-import { startGroupFeed, stopGroupFeed, refreshGroupFeed } from "./grupos-feed.js";
+import { startGroupFeed, stopGroupFeed, refreshGroupFeed, prepareSummaryDraft } from "./grupos-feed.js";
 import { groupAttachment, removeUnusedGroupFile, setGroupAvatar, uploadGroupFile } from "./grupos-midia.js";
 import { participantLink } from "./grupos-perfis.js";
 
@@ -728,8 +728,15 @@ async function init() {
   loadDirectory();
   try {
     await loadList();
-    const id = Number(new URLSearchParams(location.search).get("grupo"));
-    if (id > 0) await openGroup(id);
+    const params = new URLSearchParams(location.search);
+    const id = Number(params.get("grupo"));
+    if (id > 0 && await openGroup(id) && params.get("aba") === "feed") {
+      selectTab("feed");
+      if (params.get("sessao")) {
+        try { await prepareSummaryDraft(params.get("sessao"), state.group); }
+        catch (e) { error(e); }
+      }
+    }
   } catch (e) { error(e); }
 }
 init();

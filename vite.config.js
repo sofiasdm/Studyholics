@@ -19,6 +19,7 @@ export default defineConfig({
         gamificacao: raiz("./pages/gamificacao.html"),
         grupos: raiz("./pages/grupos.html"),
         perfil: raiz("./pages/perfil.html"),
+        historico_sessoes: raiz("./pages/historico-sessoes.html"),
         editar_perfil: raiz("./pages/editar-perfil.html"),
         login: raiz("./pages/login.html"),
         dashboard: raiz("./pages/dashboard.html"),
