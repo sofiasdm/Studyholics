@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
+import { FUSO_ESTUDOS, chaveLocal, minutosDaSemana, somarDias } from "../js/estudo-datas.js";
 
 // Exercita as funções reais da página com DOM e Supabase simulados. Nenhum teste
 // abre conexão, grava no banco ou modifica arquivos da aplicação.
@@ -40,11 +41,13 @@ function pagina({ sessoes = [], pontos = 0, saldo = pontos, usuario = "A" } = {}
   const tabela = nome => {
     const consulta = {
       select() { return this; }, eq() { return this; }, not() { return this; },
-      order() { return this; }, limit() { return this; }, maybeSingle() { return this; },
+      order() { return this; }, limit() { return this; },
+      range(from, to) { this.rangeBounds = [from, to]; return this; },
+      maybeSingle() { return this; },
       then(resolve, reject) {
-        const data = nome === "estudante"
-          ? { primeiro_nome: usuario }
-          : sessoes.filter(s => s.finalizada_em).map(s => ({ ...s }));
+        const completed = sessoes.filter(s => s.finalizada_em).map(s => ({ ...s }));
+        const data = nome === "estudante" ? { primeiro_nome: usuario }
+          : this.rangeBounds ? completed.slice(this.rangeBounds[0], this.rangeBounds[1] + 1) : completed;
         return Promise.resolve({ data, error: null }).then(resolve, reject);
       },
     };
@@ -53,6 +56,7 @@ function pagina({ sessoes = [], pontos = 0, saldo = pontos, usuario = "A" } = {}
   const supabase = {
     auth: { getSession: async () => ({ data: { session: { user: { id: usuario } } } }) },
     from: tabela,
+    rpc: async () => ({ data: 0, error: null }),
     channel: () => ({
       on(_tipo, _filtro, fn) { eventos.push(fn); return this; },
       subscribe() { return this; },
@@ -60,6 +64,7 @@ function pagina({ sessoes = [], pontos = 0, saldo = pontos, usuario = "A" } = {}
   };
   const contexto = {
     document: documento, supabase, Date: DataFixa, Intl, console,
+    FUSO_ESTUDOS, chaveLocal, minutosDaSemana, somarDias,
     exigirLogin: async () => true,
     carregarPainel: async () => ({ perfil: { pontos_acumulados: estado.pontos, saldo: estado.saldo, nivel: 2, nivel_nome: "Iniciante" } }),
     setTimeout: fn => { fn(); return 1; },
@@ -132,4 +137,17 @@ test("RF10: gráfico e métricas atualizam após nova sessão sem recarregar", a
   assert.equal(tela.get("pontos-total").textContent, "130 pts");
   assert.equal(tela.get("meta-texto").textContent, "2h 0min de 6h da meta semanal");
   assert.equal(tela.get("barra-2").title, "1h 0min");
+});
+
+test("progresso semanal inclui sessões além da primeira página do Supabase", async () => {
+  const sessions = Array.from({ length: 500 }, () => ({
+    disciplina: "A", finalizada_em: "2026-11-09T15:00:00Z", minutos_validos: 1
+  }));
+  sessions.push({ disciplina: "B", finalizada_em: "2026-11-11T15:00:00Z", minutos_validos: 25 });
+  const tela = pagina({ sessoes: sessions });
+  await tela.iniciar();
+  assert.equal(tela.get("sessoes-total").textContent, "501");
+  assert.equal(tela.get("meta-texto").textContent, "8h 45min de 6h da meta semanal");
+  assert.equal(tela.get("barra-0").title, "8h 20min");
+  assert.equal(tela.get("barra-2").title, "25min");
 });

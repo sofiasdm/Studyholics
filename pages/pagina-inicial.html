@@ -104,9 +104,9 @@
                     <i class="fas fa-bell text-xl"></i>
                     <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-pageBg"></span>
                 </button>
-                <button class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden hover:ring-2 ring-mint transition-all">
+                <a href="perfil.html" aria-label="Meu perfil" class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden hover:ring-2 ring-mint transition-all">
                     <i class="fas fa-user text-gray-500"></i>
-                </button>
+                </a>
             </div>
         </header>
 
@@ -130,7 +130,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
                 <!-- Card 1: Horas Estudadas -->
-                <div class="bg-mintLight rounded-3xl p-8 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                <div class="bg-mintLight rounded-3xl p-8 flex items-center justify-between gap-5 flex-wrap shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
                     <div class="relative z-10 flex items-center gap-6">
                         <div class="w-20 h-24 relative flex justify-center">
                             <img src="../assets/svg/icone-tempo.svg" alt="tempo icone" class="fas fa-hourglass-half text-6xl text-mint opacity-80">
@@ -139,7 +139,12 @@
                         <div>
                             <h3 class="text-darkBlue font-semibold text-lg mb-1">Horas estudadas</h3>
                             <p id="horas-total" class="text-4xl font-extrabold text-darkBlue tracking-tight">…</p>
+                            <p class="text-xs text-darkBlue/70 mt-1"><span id="sessoes-total">…</span> sessões concluídas</p>
                         </div>
+                    </div>
+                    <div class="relative z-10 flex items-center gap-3 bg-white/60 rounded-2xl px-4 py-3">
+                        <i class="fas fa-fire text-2xl text-orange-500" aria-hidden="true"></i>
+                        <div><strong id="home-streak-count" class="text-2xl font-extrabold text-darkBlue block leading-none">…</strong><span id="home-streak-label" class="text-xs text-darkBlue/70 font-bold">dias seguidos estudando</span></div>
                     </div>
                 </div>
 
@@ -185,32 +190,32 @@
 
                     <!-- Bar Chart Area (alturas e cores definidas em js/pagina-inicial.js) -->
                     <div class="flex justify-between items-end h-32 relative z-10 px-2 lg:px-4">
-                        <div class="flex flex-col items-center gap-2">
-                            <div id="barra-0" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div>
+                        <div class="weekly-day">
+                            <div class="weekly-track"><div id="barra-0" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div></div>
                             <span class="text-xs font-medium text-gray-400">Seg</span>
                         </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <div id="barra-1" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div>
+                        <div class="weekly-day">
+                            <div class="weekly-track"><div id="barra-1" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div></div>
                             <span class="text-xs font-medium text-gray-400">Ter</span>
                         </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <div id="barra-2" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div>
+                        <div class="weekly-day">
+                            <div class="weekly-track"><div id="barra-2" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div></div>
                             <span class="text-xs font-medium text-gray-400">Qua</span>
                         </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <div id="barra-3" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div>
+                        <div class="weekly-day">
+                            <div class="weekly-track"><div id="barra-3" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div></div>
                             <span class="text-xs font-medium text-gray-400">Qui</span>
                         </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <div id="barra-4" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div>
+                        <div class="weekly-day">
+                            <div class="weekly-track"><div id="barra-4" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div></div>
                             <span class="text-xs font-medium text-gray-400">Sex</span>
                         </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <div id="barra-5" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div>
+                        <div class="weekly-day">
+                            <div class="weekly-track"><div id="barra-5" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div></div>
                             <span class="text-xs font-medium text-gray-400">Sáb</span>
                         </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <div id="barra-6" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div>
+                        <div class="weekly-day">
+                            <div class="weekly-track"><div id="barra-6" class="w-8 lg:w-10 bg-white/20 rounded-t-md chart-bar" style="height: 0%;"></div></div>
                             <span class="text-xs font-medium text-gray-400">Dom</span>
                         </div>
                     </div>
@@ -220,7 +225,7 @@
                 <div class="lg:col-span-2 bg-white rounded-3xl p-8 shadow-sm border border-gray-100 flex flex-col">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold text-darkBlue">Últimas sessões</h3>
-                        <a href="#" class="text-mint text-sm font-semibold hover:text-teal-600 transition-colors flex items-center gap-1">
+                        <a href="historico-sessoes.html" class="text-mint text-sm font-semibold hover:text-teal-600 transition-colors flex items-center gap-1">
                             Ver todas <i class="fas fa-chevron-right text-xs"></i>
                         </a>
                     </div>

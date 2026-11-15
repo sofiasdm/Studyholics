@@ -8,6 +8,7 @@ const dateTime = new Intl.DateTimeFormat("pt-BR", {
 });
 let activeFeed = null;
 let channelNumber = 0;
+let summaryDraft = null;
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -24,6 +25,37 @@ function safeLink(value) {
     return null;
   }
 }
+
+function clearSummaryDraft() {
+  summaryDraft = null;
+  $("feed-summary-draft").hidden = true;
+  $("feed-text-hint").hidden = true;
+  $("feed-text").maxLength = 500;
+}
+
+export async function prepareSummaryDraft(sessionId, group) {
+  const { data, error } = await supabase.from("gam_sessao")
+    .select("id, disciplina, conteudo, resumo, finalizada_em")
+    .eq("id", sessionId).maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data?.finalizada_em || !data.resumo?.trim()) throw new Error("Resumo da sessão não encontrado.");
+  if (!group.disciplinas.some(name => name.trim().toLocaleLowerCase("pt-BR") === data.disciplina.trim().toLocaleLowerCase("pt-BR"))) {
+    throw new Error("Este grupo não estuda a disciplina da sessão.");
+  }
+  summaryDraft = { sessionId: data.id, groupId: group.id };
+  $("feed-form").reset();
+  $("feed-title").value = `Resumo: ${data.disciplina}`.slice(0, 50);
+  $("feed-text").removeAttribute("maxlength");
+  $("feed-text").value = data.resumo;
+  $("feed-text-hint").hidden = false;
+  $("feed-summary-draft").hidden = false;
+  $("feed-text").focus();
+}
+
+$("feed-summary-cancel").addEventListener("click", () => {
+  $("feed-form").reset();
+  clearSummaryDraft();
+});
 
 function setBusy(form, busy) {
   for (const field of form.elements) field.disabled = busy;
@@ -151,8 +183,31 @@ function renderComment(feed, row) {
 function renderPost(feed, row) {
   const post = element("article", "info-card feed-post");
   post.append(authorLine(feed, row));
-  if (row.titulo) post.append(element("h3", "feed-title", row.titulo));
+  if (row.titulo && !row.resumo_texto) post.append(element("h3", "feed-title", row.titulo));
   if (row.texto) post.append(element("p", "feed-body", row.texto));
+  if (row.resumo_texto) {
+    const box = element("details", "feed-summary-card");
+    box.append(element("summary", "", row.titulo || "Resumo da sessão"));
+    box.append(element("pre", "feed-summary-text", row.resumo_texto));
+    const download = element("a", "feed-summary-download", "Baixar resumo (.txt)");
+    download.href = "#";
+    download.addEventListener("click", event => {
+      event.preventDefault();
+      const title = row.titulo || "Resumo da sessão";
+      const cleanText = row.resumo_texto.replace(/\r\n?/g, "\n");
+      const file = new Blob(["\uFEFF", title, "\n\n", cleanText, "\n"], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(file);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9_-]+/g, "-").slice(0, 60) || "resumo"}.txt`;
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+    box.append(download);
+    post.append(box);
+  }
   const href = safeLink(row.link);
   if (href) {
     const link = element("a", "feed-link", row.link);
@@ -242,6 +297,7 @@ export function stopGroupFeed() {
   $("feed-connection").hidden = true;
   $("feed-more").hidden = true;
   $("feed-form").reset();
+  clearSummaryDraft();
   setBusy($("feed-form"), false);
 }
 
@@ -311,13 +367,20 @@ $("feed-form").addEventListener("submit", async event => {
   let path = null;
   try {
     if (file.size) path = await uploadGroupFile(feed.groupId, file);
-    const post = await save("grupo_publicar_com_midia", {
-      p_grupo: feed.groupId, p_titulo: titulo, p_texto: texto, p_link: url ?? "", p_midia: path
-    });
+    const draft = summaryDraft?.groupId === feed.groupId ? summaryDraft : null;
+    const post = draft
+      ? await save("grupo_publicar_resumo", {
+        p_grupo: feed.groupId, p_sessao: draft.sessionId, p_titulo: titulo,
+        p_resumo: texto, p_link: url ?? "", p_midia: path
+      })
+      : await save("grupo_publicar_com_midia", {
+        p_grupo: feed.groupId, p_titulo: titulo, p_texto: texto, p_link: url ?? "", p_midia: path
+      });
     path = null;
     if (activeFeed !== feed) return;
     addRows(feed.posts, [post]);
     form.reset();
+    clearSummaryDraft();
   } catch (error) {
     if (activeFeed === feed) feedback.textContent = error.message;
     await removeUnusedGroupFile(path);
