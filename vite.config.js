@@ -20,6 +20,8 @@ export default defineConfig({
         grupos: raiz("./pages/grupos.html"),
         perfil: raiz("./pages/perfil.html"),
         editar_perfil: raiz("./pages/editar-perfil.html"),
+        login: raiz("./pages/login.html"),
+        dashboard: raiz("./pages/dashboard.html"),
       },
     },
   },
