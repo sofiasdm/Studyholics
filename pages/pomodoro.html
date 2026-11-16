@@ -16,25 +16,44 @@
 
     <!-- Sidebar -->
     <aside class="w-64 bg-darkBlue text-white flex-col justify-between hidden md:flex h-full relative z-20 shadow-xl">
+
         <div class="flex flex-col w-full">
+            <!-- Logo Section -->
             <div class="p-8 flex flex-col items-center border-b border-white/10">
                 <div class="w-16 h-16 mb-3 flex items-center justify-center relative overflow-hidden">
                     <img src="../assets/imagens/studyholics-mark.png" alt="logo">
                 </div>
                 <h1 class="text-xl font-bold tracking-wide">Study<span class="text-mint">holics</span></h1>
-
+                <p class="text-[8px] text-white-400 mt-1 tracking-wider">Estude. Evolua. Compartilhe</p>
             </div>
+
             <!-- Adicionada a classe 'nav-link' para a trava de segurança -->
             <nav class="mt-6 flex flex-col gap-2 px-4">
-                <a href="pagina-inicial.html" class="nav-link flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 transition-all"><i class="fas fa-home w-5"></i> Início</a>
-                <a href="pomodoro.html" class="nav-link flex items-center gap-4 px-4 py-3 rounded-lg bg-gradient-to-r from-mint/100 to-transparent text-white font-semibold"><i class="fas fa-book-open w-5"></i> Estudar</a>
-                <a href="grupos.html" class="nav-link flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 transition-all"><i class="fas fa-users w-5"></i> Grupos</a>
-                <a href="perfil.html" class="nav-link flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 transition-all"><i class="fas fa-user w-5"></i> Perfil</a>
+                <a href="pagina-inicial.html" class="nav-link flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
+                    <i class="fas fa-home w-5 text-center"></i>
+                    Início
+                </a>
+                <a href="pomodoro.html" class="nav-link flex items-center gap-4 px-4 py-3 rounded-lg bg-gradient-to-r from-mint/100 to-transparent text-white font-semibold transition-all">
+                    <i class="fas fa-book-open w-5 text-center"></i>
+                    Estudar
+                </a>
+                <a href="grupos.html" class="nav-link flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
+                    <i class="fas fa-users w-5 text-center"></i>
+                    Grupos
+                </a>
+                <a href="perfil.html" class="nav-link flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
+                    <i class="fas fa-user w-5 text-center"></i>
+                    Perfil
+                </a>
             </nav>
         </div>
+
+        <!-- Bottom Links -->
         <div class="p-6 border-t border-white/10 flex flex-col gap-2">
-            <a href="#" class="nav-link flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white"><i class="fas fa-cog w-4"></i> Configurações</a>
-            <a href="#" class="nav-link flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white"><i class="fas fa-sign-out-alt w-4"></i> Sair</a>
+            <a href="#" id="btn-sair" class="nav-link flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-sign-out-alt w-4 text-center"></i>
+                Sair
+            </a>
         </div>
     </aside>
 

@@ -37,55 +37,12 @@
         }
     </script>
     <link rel="stylesheet" href="../css/pagina-inicial.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
 </head>
 <body class="bg-pageBg font-inter text-textDark h-screen flex overflow-hidden">
 
     <!-- Sidebar -->
-    <aside class="w-64 bg-darkBlue text-white flex-col justify-between hidden md:flex h-full relative z-20 shadow-xl">
-
-        <div class="flex flex-col w-full">
-            <!-- Logo Section -->
-            <div class="p-8 flex flex-col items-center border-b border-white/10">
-                <div class="w-16 h-16 mb-3 flex items-center justify-center relative overflow-hidden">
-                    <img src="../assets/imagens/studyholics-mark.png" alt="logo">
-                </div>
-                <h1 class="text-xl font-bold tracking-wide">Study<span class="text-mint">holics</span></h1>
-                <p class="text-[8px] text-white-400 mt-1 tracking-wider">Estude. Evolua. Compartilhe</p>
-            </div>
-
-            <!-- Navigation -->
-            <nav class="mt-6 flex flex-col gap-2 px-4">
-                <a href="pagina-inicial.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
-                    <i class="fas fa-home w-5 text-center"></i>
-                    Início
-                </a>
-                <a href="pomodoro.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
-                    <i class="fas fa-book-open w-5 text-center"></i>
-                    Estudar
-                </a>
-                <a href="grupos.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-all border-l-4 border-transparent">
-                    <i class="fas fa-users w-5 text-center"></i>
-                    Grupos
-                </a>
-                <a href="perfil.html" target="_self" rel="noopener" class="flex items-center gap-4 px-4 py-3 rounded-lg bg-gradient-to-r from-mint/100 to-transparent text-white font-semibold transition-all">
-                    <i class="fas fa-user w-5 text-center"></i>
-                    Perfil
-                </a>
-            </nav>
-        </div>
-
-        <!-- Bottom Links -->
-        <div class="p-6 border-t border-white/10 flex flex-col gap-2">
-            <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
-                <i class="fas fa-cog w-4 text-center"></i>
-                Configurações
-            </a>
-            <a href="#" id="btn-sair" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
-                <i class="fas fa-sign-out-alt w-4 text-center"></i>
-                Sair
-            </a>
-        </div>
-    </aside>
+    <aside id="sidebar" class="sh-sidebar"></aside>
 
     <main class="flex-1 flex flex-col h-full overflow-y-auto relative">
         <!-- Top Navbar -->
@@ -150,6 +107,12 @@
                             <p data-erro="sobrenome" class="text-xs font-semibold text-red-600 mt-1 min-h-[1rem]" role="alert"></p>
                         </div>
 
+                        <div>
+                            <label for="username" class="block text-lg font-extrabold text-darkBlue mb-1">Nome de usuário</label>
+                            <input id="username" name="username" type="text" maxlength="30" autocomplete="off" placeholder="Ex: felipe123" class="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium text-darkBlue focus:border-mint focus:ring-2 focus:ring-mint/30 outline-none transition-all disabled:bg-gray-100 disabled:text-gray-400" disabled>
+                            <p data-erro="username" class="text-xs font-semibold text-red-600 mt-1 min-h-[1rem]" role="alert"></p>
+                        </div>
+
                         <fieldset class="border-2 border-gray-200 rounded-2xl p-5 mt-1">
                             <legend class="px-2 text-lg font-extrabold text-darkBlue">Dados Acadêmicos</legend>
                             <div class="flex flex-col gap-3">
@@ -191,26 +154,7 @@
         </div>
     </main>
 
-    <!-- Mobile Menu -->
-    <div class="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 z-30 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
-        <a href="pagina-inicial.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-gray-400 hover:text-mint">
-            <i class="fas fa-home text-lg"></i>
-            <span class="text-[10px] font-semibold">Início</span>
-        </a>
-        <a href="pomodoro.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-gray-400 hover:text-mint">
-            <i class="fas fa-book-open text-lg"></i>
-            <span class="text-[10px] font-semibold">Estudar</span>
-        </a>
-        <a href="grupos.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-gray-400 hover:text-mint">
-            <i class="fas fa-users text-lg"></i>
-            <span class="text-[10px] font-semibold">Grupos</span>
-        </a>
-        <a href="perfil.html" target="_self" rel="noopener" class="flex flex-col items-center gap-1 text-mint">
-            <i class="fas fa-user text-lg"></i>
-            <span class="text-[10px] font-semibold">Perfil</span>
-        </a>
-    </div>
-
+    <script type="module" src="../js/sidebar.js"></script>
     <script type="module" src="../js/editar-perfil.js"></script>
 </body>
 </html>

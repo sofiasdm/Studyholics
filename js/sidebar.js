@@ -38,7 +38,6 @@ function montar() {
       </nav>
     </div>
     <div class="sh-baixo">
-      <a href="editar-perfil.html" class="nav-link"><i class="fas fa-cog" aria-hidden="true"></i>Configurações</a>
       <a href="#" id="btn-sair" class="nav-link"><i class="fas fa-sign-out-alt" aria-hidden="true"></i>Sair</a>
     </div>`;
 

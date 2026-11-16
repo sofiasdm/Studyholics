@@ -6,7 +6,7 @@ import { supabase } from "./supabaseClient.js";
 // Dados do próprio estudante + nome do curso (o curso vem da tabela CURSO pela chave id_curso)
 export async function buscarPerfil(userId) {
   const { data, error } = await supabase.from("estudante")
-    .select("primeiro_nome, sobrenome, semestre, campus, foto_url, id_curso, curso(nome_curso)")
+    .select("primeiro_nome, sobrenome, username, semestre, campus, foto_url, id_curso, curso(nome_curso)")
     .eq("id_usuario", userId)
     .maybeSingle();
   if (error) throw new Error(error.message);

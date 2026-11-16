@@ -3,7 +3,7 @@
 // então não atrasa quando a aba fica em segundo plano. O tempo de FOCO é acumulado
 // em milissegundos (só enquanto está em modo foco e rodando).
 export class PomodoroTimer {
-  constructor(onTick, onAlarme, onMudarSessao) {
+  constructor(onTick, onAlarme, onMudarSessao, onConcluir) {
     this.config = { foco: 25, pausaCurta: 5, pausaLonga: 10, intervalosPausaLonga: 4 };
     this.modo = "foco";          // 'foco', 'pausaCurta' ou 'pausaLonga'
     this.ciclosCompletos = 0;    // pomodoros de foco concluídos
@@ -16,6 +16,7 @@ export class PomodoroTimer {
     this.onTick = onTick;
     this.onAlarme = onAlarme;
     this.onMudarSessao = onMudarSessao;
+    this.onConcluir = onConcluir;
   }
 
   get rodando() { return this.intervalo !== null; }
@@ -107,47 +108,58 @@ export class PomodoroTimer {
     this.ciclosCompletos = Math.floor(naoNeg(e.ciclosCompletos));
     this.msFoco = naoNeg(e.msFoco);
     this.restanteMs = naoNeg(e.restanteMs, this.config.foco * 60000);
-    if (e.rodando && Number.isFinite(Number(e.fim)) && Number.isFinite(Number(e.ultimo))) {
+    if (e.rodando && Number.isFinite(Number(e.fim)) && Number(e.ultimo)) {
       this.fim = Number(e.fim);
       this.ultimo = Number(e.ultimo);
       this.intervalo = setInterval(() => this.tick(), 250);
       const alarme = this.onAlarme;
+      const concluir = this.onConcluir;
       this.onAlarme = null;   // não toca alarme das fases que passaram com a página fechada
       // [N1-fix: desconta fase por fase, usando o fim de cada uma como início da seguinte]
       let guarda = 0;
-      while (Date.now() >= this.fim && guarda++ < 1000) {
+      let concluiuOffline = false;
+      while (this.rodando && Date.now() >= this.fim && guarda++ < 1000) {
         const fimDaFase = this.fim;
         this.acumular();                          // soma o foco que cabe até o fim desta fase
-        this.alternarModo();                      // passa para a fase seguinte
+        this.alternarModo(fimDaFase);             // passa para a fase seguinte (ou encerra)
+        if (!this.rodando) {
+          concluiuOffline = true;
+          break;
+        }
         this.fim = fimDaFase + this.restanteMs;   // ela começou quando a anterior terminou, não agora
         this.ultimo = fimDaFase;
       }
       this.onAlarme = alarme;
+      this.onConcluir = concluir;
+      if (concluiuOffline && this.onConcluir) {
+        this.onConcluir();
+        return;
+      }
     }
     if (this.onTick) this.onTick(this.formatarTempo());
   }
 
-  // Troca de fase com o cronômetro rodando (o intervalo continua)
+  // Troca de fase com o cronômetro rodando; encerra ao completar os ciclos configurados
   alternarModo(inicio = Date.now()) {
     let mensagem;
     if (this.modo === "foco") {
       this.ciclosCompletos++;
-      if (this.onMudarSessao) this.onMudarSessao(this.ciclosCompletos + 1);
-      if (this.ciclosCompletos % this.config.intervalosPausaLonga === 0) {
-        this.modo = "pausaLonga";
-        this.restanteMs = this.config.pausaLonga * 60000;
-        mensagem = "Pausa longa! Descanse.";
-      } else {
-        this.modo = "pausaCurta";
-        this.restanteMs = this.config.pausaCurta * 60000;
-        mensagem = "Pausa curta! Respire um pouco.";
+      if (this.ciclosCompletos >= this.config.intervalosPausaLonga) {
+        this.pausar();
+        this.restanteMs = 0;
+        if (this.onTick) this.onTick("00:00");
+        if (this.onConcluir) this.onConcluir();
+        return;
       }
+      if (this.onMudarSessao) this.onMudarSessao(this.ciclosCompletos + 1);
+      this.modo = "pausaCurta";
+      this.restanteMs = this.config.pausaCurta * 60000;
+      mensagem = "Pausa curta! Respire um pouco.";
     } else {
       this.modo = "foco";
       this.restanteMs = this.config.foco * 60000;
       mensagem = "De volta ao foco!";
     }
-    const agora = Date.now();
     this.fim = inicio + this.restanteMs;
     this.ultimo = inicio;
     if (this.onTick) this.onTick(this.formatarTempo());

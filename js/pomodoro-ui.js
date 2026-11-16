@@ -6,10 +6,52 @@ import { DISCIPLINAS, OUTRA_DISCIPLINA } from "./disciplinas.js";
 
 const $ = id => document.getElementById(id);
 const tela = { config: $("tela-configuracao"), andamento: $("tela-andamento"), resumo: $("tela-resumo"), conclusao: $("tela-conclusao") };
-const clock = new PomodoroTimer(value => { $("timer-display-ativo").textContent = value; }, message => showNotice(message, "info"), count => { $("contador-sessao").textContent = `Sessão: ${count}`; });
+const TITULO_PADRAO = "Studyholics - Pomodoro";
+
+function tocarAlarme() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    [523.25, 659.25, 783.99].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.18);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.45);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.18);
+      osc.stop(ctx.currentTime + i * 0.18 + 0.45);
+    });
+  } catch { /* navegador bloqueou áudio automático */ }
+}
+
+const clock = new PomodoroTimer(
+  value => {
+    $("timer-display-ativo").textContent = value;
+    document.title = `${value} — Studyholics`;
+  },
+  message => {
+    tocarAlarme();
+    showNotice(message, "info");
+  },
+  count => {
+    $("contador-sessao").textContent = `Sessão: ${count}`;
+  },
+  () => {
+    tocarAlarme();
+    $("btn-pausar-continuar").innerHTML = '<i class="fa-solid fa-play"></i> Continuar';
+    show("resumo");
+    showNotice("Todos os ciclos concluídos! Escreva um resumo (opcional) e salve sua sessão.", "info");
+  }
+);
+
 let sessionId = null;
 let saving = false;
 let destination = null;
+let gruposUsuario = [];
 
 function disciplina() { return $("disc-nome").value === OUTRA_DISCIPLINA ? $("disc-outra").value.trim() : $("disc-nome").value; }
 
@@ -18,6 +60,7 @@ let telaAtual = "config";
 function show(screen) {
   telaAtual = screen;
   Object.entries(tela).forEach(([key, node]) => { node.style.display = key === screen ? "block" : "none"; });
+  if (screen === "conclusao" || screen === "config") document.title = TITULO_PADRAO;
   if (screen === "conclusao") limparEstado();
   else salvarEstado();
 }
@@ -56,13 +99,15 @@ function restaurarEstado() {
 
   if (e.sessionId && e.timer && (e.tela === "andamento" || e.tela === "resumo")) {
     sessionId = e.sessionId;
-    clock.restaurar(e.timer);
     currentDescription();
-    $("contador-sessao").textContent = `Sessão: ${clock.ciclosCompletos + 1}`;
-    $("btn-pausar-continuar").innerHTML = clock.rodando
-      ? '<i class="fa-solid fa-pause"></i> Pausar' : '<i class="fa-solid fa-play"></i> Continuar';
-    show(e.tela);
-    showNotice("Sessão retomada de onde você parou.", "info");
+    clock.restaurar(e.timer);
+    if (telaAtual !== "resumo") {
+      $("contador-sessao").textContent = `Sessão: ${clock.ciclosCompletos + 1}`;
+      $("btn-pausar-continuar").innerHTML = clock.rodando
+        ? '<i class="fa-solid fa-pause"></i> Pausar' : '<i class="fa-solid fa-play"></i> Continuar';
+      show(e.tela);
+      showNotice("Sessão retomada de onde você parou.", "info");
+    }
   }
 }
 setInterval(salvarEstado, 2000);
@@ -86,6 +131,7 @@ function reset() {
   clock.resetar(); sessionId = null;
   $("texto-resumo").value = "";
   $("timer-display-inicial").textContent = `${String($("input-foco").value).padStart(2, "0")}:00`;
+  document.getElementById("btn-compartilhar-grupo")?.remove();
   show("config");
   showNotice("");
 }
@@ -118,25 +164,60 @@ $("btn-iniciar-sessao").addEventListener("click", async () => {
     const values = config();
     sessionId = await iniciarSessao(disciplina(), $("disc-conteudo").value.trim(), values.foco);
     clock.resetar(); clock.configurar(values); currentDescription(); clock.iniciar();
+    $("contador-sessao").textContent = "Sessão: 1";
     $("btn-pausar-continuar").innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
     show("andamento");
   } catch (e) { showNotice(e.message); }
   finally { button.disabled = false; }
 });
 $("btn-pausar-continuar").addEventListener("click", toggleRunning);
-$("btn-abrir-resumo").addEventListener("click", () => { clock.pausar(); show("resumo"); });
-$("btn-cancelar-resumo").addEventListener("click", () => { show("andamento"); $("btn-pausar-continuar").innerHTML = '<i class="fa-solid fa-play"></i> Continuar'; });
+$("btn-abrir-resumo").addEventListener("click", () => {
+  clock.pausar();
+  show("resumo");
+  if (clock.minutosFocados < 1) {
+    showNotice("Você focou por menos de 1 minuto. Sessões com 0 min não geram pontos.", "info");
+  }
+});
+$("btn-cancelar-resumo").addEventListener("click", () => {
+  showNotice("");
+  show("andamento");
+  $("btn-pausar-continuar").innerHTML = '<i class="fa-solid fa-play"></i> Continuar';
+});
 
 $("btn-salvar-sessao").addEventListener("click", async () => {
   if (!sessionId || saving) return;
   saving = true;
   const button = $("btn-salvar-sessao"); button.disabled = true; button.textContent = "Salvando…";
   try {
-    const result = await finalizarSessao(sessionId, clock.minutosFocados, $("texto-resumo").value.trim() || null);
+    const idSalvo = sessionId;
+    const resumoTexto = $("texto-resumo").value.trim() || null;
+    const discAtual = disciplina();
+    const result = await finalizarSessao(idSalvo, clock.minutosFocados, resumoTexto);
+
     $("pontos-display").textContent = `${result.pontos_da_sessao || 0} pontos!`;
     $("display-tempo-final").textContent = `${result.minutos_validos || 0} min`;
-    $("disc-nome-final").textContent = disciplina();
+    $("disc-nome-final").textContent = discAtual;
     $("disc-conteudo-final").textContent = $("disc-conteudo").value.trim() || "Sem conteúdo informado";
+
+    document.getElementById("btn-compartilhar-grupo")?.remove();
+    if (resumoTexto) {
+      const norm = s => s.trim().toLocaleLowerCase("pt-BR");
+      const grupoAlvo = gruposUsuario.find(g => (g.disciplinas || []).some(d => norm(d) === norm(discAtual)));
+      if (grupoAlvo) {
+        const btnGrupo = document.createElement("a");
+        btnGrupo.id = "btn-compartilhar-grupo";
+        btnGrupo.className = "btn-borda-verde";
+        btnGrupo.style.marginLeft = "12px";
+        btnGrupo.style.textDecoration = "none";
+        btnGrupo.style.display = "inline-flex";
+        btnGrupo.style.alignItems = "center";
+        btnGrupo.style.gap = "8px";
+        btnGrupo.href = `grupos.html?grupo=${encodeURIComponent(grupoAlvo.id)}&resumo=${encodeURIComponent(idSalvo)}`;
+        btnGrupo.innerHTML = `<i class="fa-solid fa-share-nodes"></i> Publicar no grupo ${grupoAlvo.nome}`;
+        $("btn-nova-sessao").parentElement.append(btnGrupo);
+      }
+    }
+
     sessionId = null;
     show("conclusao"); showNotice("");
   } catch (e) { showNotice(e.message); }
@@ -181,7 +262,10 @@ async function init() {
 
   const options = new Set(DISCIPLINAS);
   const { data, error } = await supabase.rpc("grupo_listar");
-  if (!error) data.forEach(g => (g.disciplinas || []).forEach(s => options.add(s)));
+  if (!error && Array.isArray(data)) {
+    gruposUsuario = data;
+    data.forEach(g => (g.disciplinas || []).forEach(s => options.add(s)));
+  }
 
   $("disc-nome").replaceChildren(new Option("Selecione a disciplina", ""),
     ...[...options].sort((a, b) => a.localeCompare(b, "pt-BR")).map(s => new Option(s, s)),

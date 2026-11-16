@@ -7,9 +7,10 @@ import { buscarPerfil, buscarCursos, enviarFoto, salvarPerfil } from "./perfil.j
 import { validarPerfil, validarFoto, CAMPI, CAMPUS_ATIVO, LIMITES } from "./perfil-util.js";
 
 const $ = id => document.getElementById(id);
-const CAMPOS = ["nome", "sobrenome", "curso", "semestre", "campus"];
+const CAMPOS = ["nome", "sobrenome", "username",  "curso", "semestre", "campus"];
 
 let userId = null;
+let usernameAtual = "";
 let arquivoFoto = null;   // foto escolhida e ainda não enviada
 let urlPrevia = null;     // endereço temporário da pré-visualização
 let cursos = [];          // duracao_periodos null = período não se aplica (mestrado)
@@ -107,9 +108,11 @@ async function salvar(e) {
   const v = validarPerfil({
     nome: $("nome").value,
     sobrenome: $("sobrenome").value,
+    username: $("username").value,
     idCurso: $("curso").value,
     semestre: $("semestre").value,
     campus: $("campus").value,
+    exigeUsername: true,
     exigeCampus: true,
     exigeCurso: emDoisIrmaos,
     exigePeriodo: emDoisIrmaos && cursoAtual()?.duracao_periodos != null,
@@ -124,6 +127,19 @@ async function salvar(e) {
   botao.disabled = true;
   texto.textContent = "Salvando…";
   try {
+    // Se mudou o nome de usuário, verifica no banco se o novo está livre (mesma RPC do cadastro)
+    if (v.valores.username.toLowerCase() !== usernameAtual.toLowerCase()) {
+      const { data: livre, error: erroUser } = await supabase.rpc("username_disponivel", { p_username: v.valores.username });
+      if (erroUser) throw erroUser;
+      if (!livre) {
+        mostrarErroCampo("username", "Esse nome de usuário já está em uso.");
+        $("username").focus();
+        botao.disabled = false;
+        texto.textContent = "Salvar alterações";
+        return;
+      }
+    }
+
     const campos = { ...v.valores };
     if (arquivoFoto) campos.foto_url = await enviarFoto(arquivoFoto, userId);
     await salvarPerfil(userId, campos);
@@ -166,11 +182,13 @@ async function iniciar() {
   if (!perfil) return mostrarStatus("Não encontramos os dados do seu perfil.", "erro");
   cursos = listaCursos;
 
+  usernameAtual = perfil.username ?? "";
   $("nome").value = perfil.primeiro_nome ?? "";
   $("sobrenome").value = perfil.sobrenome ?? "";
+  $("username").value = usernameAtual;
   $("nome").maxLength = LIMITES.nome;
   $("sobrenome").maxLength = LIMITES.sobrenome;
-
+  $("username").maxLength = LIMITES.username;
   // Se o campus gravado não estiver na lista (ex.: valor antigo), ele aparece mesmo assim
   const campi = perfil.campus && !CAMPI.includes(perfil.campus) ? [...CAMPI, perfil.campus] : CAMPI;
   preencherSelect($("campus"), campi.map(c => [c, c]), perfil.campus);
