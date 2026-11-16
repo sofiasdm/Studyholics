@@ -10,7 +10,6 @@ import {
 // Troque para "login.html" quando a página pages/login.html estiver pronta.
 const PAGINA_LOGIN = "../index.html";
 // Para onde ir quando o cadastro já deixa a pessoa logada (mesma pasta: pages/)
-const PAGINA_HOME = "pagina-inicial.html";
 
 // Limites da foto (iguais aos do bucket "avatars" no Supabase)
 const TIPOS_FOTO = ["image/jpeg", "image/png", "image/webp"];
@@ -38,21 +37,23 @@ $("#back").addEventListener("click", () => {
 $$("form.step").forEach(form => {
   const etapa = Number(form.dataset.step);
   ligarFormulario(form, () => {
+    if (etapa === 1) return withBusy(form, () => avancarEtapa1(form));
     if (etapa < 3) return mostrarEtapa(etapa + 1);
     withBusy(form, () => cadastrar(form));
   });
 });
 
+async function avancarEtapa1(form) {
+  const email = form.elements.email.value.trim();
+  const { data: livre, error } = await supabase.rpc("email_disponivel", { p_email: email });
+  if (error) console.warn("Não foi possível conferir o e-mail agora.", error);
+  else if (!livre) return setError(form.elements.email, "Este e-mail já está cadastrado. Entre com a sua conta.");
+  mostrarEtapa(2);
+}
 // ---------- Cursos (vêm da tabela CURSO) ----------
 // ---------- Campus, curso e período ----------
-const CAMPUS_ATIVO = "UFRPE - Dois Irmãos"; // os outros campi aparecem como "Em breve"
-const CAMPI = [
-  CAMPUS_ATIVO,
-  "UFRPE - Garanhuns (UAG)",
-  "UFRPE - Cabo de Santo Agostinho (UACSA)",
-  "UFRPE - Serra Talhada (UAST)",
-  "UFRPE - Belo Jardim (UABJ)",
-];
+import { CAMPI, CAMPUS_ATIVO } from "./perfil-util.js";
+
 let cursos = []; // duracao_periodos null = período não se aplica (mestrado)
 
 const campoCampus = () => $('select[name="campus"]');
@@ -159,7 +160,8 @@ async function cadastrar(form) {
     catch (e) { console.error(e); mensagem = "Conta criada! (A foto não pôde ser enviada.)"; }
   }
   setStatus(form, mensagem);
-  setTimeout(() => (window.location.href = PAGINA_HOME), 1200);
+  await supabase.auth.signOut();   // não deixa logado: vai para o login
+  setTimeout(() => (window.location.href = PAGINA_LOGIN), 1800);
 }
 
 async function uploadFoto(file, userId) {

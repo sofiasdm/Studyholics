@@ -10,6 +10,27 @@ let activeFeed = null;
 let channelNumber = 0;
 let summaryDraft = null;
 
+const authorPhotos = new Map();
+
+async function ensureAuthorPhotos(groupId) {
+  if (authorPhotos.has(groupId)) return authorPhotos.get(groupId);
+  const map = new Map();
+  authorPhotos.set(groupId, map);
+  const { data } = await supabase.rpc("grupo_detalhes", { p_grupo: groupId });
+  for (const m of data?.membros ?? []) {
+    if (m.id && m.foto_url) map.set(String(m.id), m.foto_url);
+  }
+  for (const img of document.querySelectorAll(`img[data-feed-avatar]`)) {
+    const url = map.get(img.dataset.feedAvatar);
+    if (url) {
+      img.src = url;
+      img.hidden = false;
+      img.nextElementSibling?.setAttribute("hidden", "");
+    }
+  }
+  return map;
+}
+
 function element(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -315,6 +336,7 @@ export function startGroupFeed(groupId, participant) {
     errorText: "Não foi possível carregar o feed do grupo."
   });
   activeFeed = feed;
+  ensureAuthorPhotos(groupId);
 
   const changes = table => ({ event: "INSERT", schema: "public", table, filter: `id_grupo=eq.${groupId}` });
   feed.channel = supabase.channel(`grupo-feed-${groupId}-${++channelNumber}`)

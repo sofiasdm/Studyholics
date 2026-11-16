@@ -39,17 +39,71 @@ export function setGroupAvatar(container, path) {
   fallback.className = "fa-solid fa-users";
   fallback.setAttribute("aria-hidden", "true");
   container.replaceChildren(fallback);
-  if (!path) return;
+
+  // Garante formato circular perfeito (esfera) sem achatar
+  Object.assign(container.style, {
+    borderRadius: "50%",
+    aspectRatio: "1 / 1",
+    overflow: "hidden",
+    flexShrink: "0",
+    cursor: path ? "pointer" : ""
+  });
+
+  if (!path) {
+    container.onclick = null;
+    return;
+  }
 
   const image = document.createElement("img");
-  image.alt = "";
+  image.alt = "Foto do grupo (clique para ampliar)";
   image.className = "group-avatar-image";
+  Object.assign(image.style, {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    borderRadius: "50%",
+    display: "block"
+  });
   image.hidden = true;
   container.append(image);
+
   image.addEventListener("load", () => {
     fallback.hidden = true;
     image.hidden = false;
   }, { once: true });
+
+  container.onclick = e => {
+    e.stopPropagation();
+    if (!image.src || image.hidden) return;
+    let dlg = document.getElementById("sh-avatar-preview-dialog");
+    if (!dlg) {
+      dlg = document.createElement("dialog");
+      dlg.id = "sh-avatar-preview-dialog";
+      Object.assign(dlg.style, {
+        border: "none",
+        borderRadius: "1.25rem",
+        padding: "1.25rem",
+        background: "#ffffff",
+        boxShadow: "0 20px 45px rgba(0, 0, 0, 0.35)",
+        maxWidth: "90vw",
+        maxHeight: "90vh",
+        textAlign: "center"
+      });
+      dlg.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:0.75rem;">
+          <strong style="font-size:0.95rem;color:#0B1F44;">Foto do grupo</strong>
+          <button type="button" aria-label="Fechar imagem" style="background:none;border:none;font-size:1.5rem;line-height:1;cursor:pointer;color:#0B1F44;">&times;</button>
+        </div>
+        <img alt="Foto do grupo ampliada" style="width:min(360px, 75vw);height:min(360px, 75vw);border-radius:50%;object-fit:cover;display:block;margin:0 auto;border:4px solid #f1f5f9;">
+      `;
+      dlg.querySelector("button").addEventListener("click", () => dlg.close());
+      dlg.addEventListener("click", ev => { if (ev.target === dlg) dlg.close(); });
+      document.body.append(dlg);
+    }
+    dlg.querySelector("img").src = image.src;
+    dlg.showModal();
+  };
+
   bucket.createSignedUrl(path, 600).then(({ data }) => {
     if (data) image.src = data.signedUrl;
   });

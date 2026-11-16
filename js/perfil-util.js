@@ -3,7 +3,7 @@
 // validação do formulário, validação da foto e formatação de textos.
 
 // Limites iguais aos das colunas da tabela ESTUDANTE (primeiro_nome 60, sobrenome 100, campus 80)
-export const LIMITES = { nome: 60, sobrenome: 100, campus: 80 };
+export const LIMITES = { nome: 60, sobrenome: 100, username: 30, campus: 80 };
 
 // Mesmos limites do bucket "avatars" no Supabase (tipos e 2 MB)
 export const TIPOS_FOTO = ["image/jpeg", "image/png", "image/webp"];
@@ -53,16 +53,25 @@ export function validarPerfil(entrada) {
   const erros = {};
   const nome = limpar(entrada.nome);
   const sobrenome = limpar(entrada.sobrenome);
+  const username = String(entrada.username ?? "").trim();
   const campus = limpar(entrada.campus);
   const idCurso = Number(entrada.idCurso);
   const semestre = Number(entrada.semestre);
-  const { exigeCampus = false, exigeCurso = true, exigePeriodo = true } = entrada;
+  const { exigeCampus = false, exigeCurso = true, exigePeriodo = true, exigeUsername = false } = entrada;
 
   if (!nome) erros.nome = "Informe seu nome.";
   else if (nome.length > LIMITES.nome) erros.nome = `Use no máximo ${LIMITES.nome} caracteres.`;
 
   if (!sobrenome) erros.sobrenome = "Informe seu sobrenome.";
   else if (sobrenome.length > LIMITES.sobrenome) erros.sobrenome = `Use no máximo ${LIMITES.sobrenome} caracteres.`;
+
+  if (exigeUsername || entrada.username !== undefined) {
+    if (!username) erros.username = "Informe seu nome de usuário.";
+    else if (username.length < 3 || username.length > LIMITES.username)
+      erros.username = `Use entre 3 e ${LIMITES.username} caracteres.`;
+    else if (!/^[a-zA-Z0-9._]+$/.test(username))
+      erros.username = "Use apenas letras, números, ponto (.) ou underline (_).";
+  }
 
   if (exigeCampus && !campus) erros.campus = "Selecione seu campus.";
 
@@ -73,15 +82,18 @@ export function validarPerfil(entrada) {
 
   if (campus.length > LIMITES.campus) erros.campus = `Use no máximo ${LIMITES.campus} caracteres.`;
 
+  const valores = {
+    primeiro_nome: nome,
+    sobrenome,
+    id_curso: entrada.idCurso ? idCurso : null,   // vazio = campo desabilitado ("Em breve" / "Não se aplica")
+    semestre: entrada.semestre ? semestre : null,
+    campus: campus || null, // vazio = "não informado"
+  };
+  if (exigeUsername || entrada.username !== undefined) valores.username = username;
+
   return {
     ok: Object.keys(erros).length === 0,
     erros,
-    valores: {
-      primeiro_nome: nome,
-      sobrenome,
-      id_curso: entrada.idCurso ? idCurso : null,   // vazio = campo desabilitado ("Em breve" / "Não se aplica")
-      semestre: entrada.semestre ? semestre : null,
-      campus: campus || null, // vazio = "não informado"
-    },
+    valores,
   };
 }

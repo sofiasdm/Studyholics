@@ -1,0 +1,43 @@
+/* css/sidebar.css — barra lateral única (mesmo visual da página inicial), sem depender do Tailwind */
+.sh-sidebar {
+  display: none; flex: 0 0 16rem; width: 16rem; flex-direction: column; justify-content: space-between;
+  position: sticky; top: 0; z-index: 20; height: 100dvh; overflow-y: auto;
+  background: #0B1F44; color: #fff; font-family: 'Nunito', sans-serif;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.1);
+}
+@media (min-width: 768px) { .sh-sidebar { display: flex; } }
+.sh-sidebar *, .sh-bottom * { box-sizing: border-box; }
+.sh-sidebar a { text-decoration: none; }
+.sh-logo { display: flex; flex-direction: column; align-items: center; padding: 2rem; border-bottom: 1px solid rgba(255,255,255,.1); }
+.sh-logo-img { width: 4rem; height: 4rem; margin-bottom: .75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.sh-logo-img img { max-width: 100%; height: auto; }
+.sh-logo h1 { margin: 0; font-size: 1.25rem; line-height: 1.75rem; font-weight: 700; letter-spacing: .025em; color: #fff; }
+.sh-logo h1 span { color: #44BBA4; }
+.sh-logo p { margin: .25rem 0 0; font-size: 8px; line-height: 1.5; letter-spacing: .05em; color: #fff; }
+.sh-nav { display: flex; flex-direction: column; gap: .5rem; margin-top: 1.5rem; padding: 0 1rem; }
+.sh-link { display: flex; align-items: center; gap: 1rem; padding: .75rem 1rem; border-radius: .5rem; color: #d1d5db;
+  border-left: 4px solid transparent; transition: background-color .15s, color .15s; font-size: 1rem; line-height: 1.5rem; }
+.sh-link:hover { background: rgba(255,255,255,.05); color: #fff; }
+.sh-link.ativo { background: linear-gradient(to right, #44BBA4, transparent); color: #fff; font-weight: 600; border-left: 0; }
+.sh-link i { width: 1.25rem; text-align: center; }
+.sh-baixo { display: flex; flex-direction: column; gap: .5rem; padding: 1.5rem; border-top: 1px solid rgba(255,255,255,.1); }
+.sh-baixo a { display: flex; align-items: center; gap: .75rem; padding: .5rem 1rem; font-size: .875rem; line-height: 1.25rem; color: #9ca3af; transition: color .15s; }
+.sh-baixo a:hover { color: #fff; }
+.sh-baixo i { width: 1rem; text-align: center; }
+
+/* Menu inferior (celular) */
+.sh-bottom { position: fixed; bottom: 0; left: 0; width: 100%; z-index: 30; display: flex; justify-content: space-around;
+  padding: .75rem; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 -5px 15px rgba(0,0,0,.05); font-family: 'Nunito', sans-serif; }
+@media (min-width: 768px) { .sh-bottom { display: none; } }
+.sh-bottom a { display: flex; flex-direction: column; align-items: center; gap: .25rem; color: #9ca3af; text-decoration: none; }
+.sh-bottom a:hover, .sh-bottom a.ativo { color: #44BBA4; }
+.sh-bottom i { font-size: 1.125rem; line-height: 1.75rem; }
+.sh-bottom span { font-size: 10px; line-height: 1.5; font-weight: 600; }
+
+/* Painel do sino de notificações (barra do topo) */
+.sh-notif { position: absolute; top: calc(100% + .75rem); right: 0; z-index: 40; width: 16rem; padding: 1rem;
+  background: #fff; border: 1px solid #e5e7eb; border-radius: .75rem; box-shadow: 0 10px 25px rgba(0,0,0,.12);
+  font-family: 'Nunito', sans-serif; color: #0B1F44; text-align: left; }
+.sh-notif[hidden] { display: none; }
+.sh-notif strong { display: block; font-size: .95rem; font-weight: 800; }
+.sh-notif p { margin: .35rem 0 0; font-size: .85rem; color: #7a7a7a; font-weight: 600; }
