@@ -86,8 +86,49 @@ export class PomodoroTimer {
     else if (this.onTick) this.onTick(this.formatarTempo());
   }
 
+  // [N1: guardar e retomar o estado]
+  exportar() {
+    this.acumular();
+    return {
+      config: { ...this.config }, modo: this.modo, ciclosCompletos: this.ciclosCompletos,
+      restanteMs: this.rodando ? Math.max(0, this.fim - Date.now()) : this.restanteMs,
+      msFoco: this.msFoco, rodando: this.rodando, fim: this.fim, ultimo: this.ultimo,
+    };
+  }
+
+  restaurar(e = {}) {
+    this.pausar();
+    const naoNeg = (v, padrao = 0) => (Number.isFinite(Number(v)) && Number(v) >= 0 ? Number(v) : padrao);
+    for (const chave of Object.keys(this.config)) {
+      const n = Math.floor(Number(e.config?.[chave]));
+      if (Number.isFinite(n) && n >= 1) this.config[chave] = n;
+    }
+    this.modo = ["foco", "pausaCurta", "pausaLonga"].includes(e.modo) ? e.modo : "foco";
+    this.ciclosCompletos = Math.floor(naoNeg(e.ciclosCompletos));
+    this.msFoco = naoNeg(e.msFoco);
+    this.restanteMs = naoNeg(e.restanteMs, this.config.foco * 60000);
+    if (e.rodando && Number.isFinite(Number(e.fim)) && Number.isFinite(Number(e.ultimo))) {
+      this.fim = Number(e.fim);
+      this.ultimo = Number(e.ultimo);
+      this.intervalo = setInterval(() => this.tick(), 250);
+      const alarme = this.onAlarme;
+      this.onAlarme = null;   // não toca alarme das fases que passaram com a página fechada
+      // [N1-fix: desconta fase por fase, usando o fim de cada uma como início da seguinte]
+      let guarda = 0;
+      while (Date.now() >= this.fim && guarda++ < 1000) {
+        const fimDaFase = this.fim;
+        this.acumular();                          // soma o foco que cabe até o fim desta fase
+        this.alternarModo();                      // passa para a fase seguinte
+        this.fim = fimDaFase + this.restanteMs;   // ela começou quando a anterior terminou, não agora
+        this.ultimo = fimDaFase;
+      }
+      this.onAlarme = alarme;
+    }
+    if (this.onTick) this.onTick(this.formatarTempo());
+  }
+
   // Troca de fase com o cronômetro rodando (o intervalo continua)
-  alternarModo() {
+  alternarModo(inicio = Date.now()) {
     let mensagem;
     if (this.modo === "foco") {
       this.ciclosCompletos++;
@@ -107,8 +148,8 @@ export class PomodoroTimer {
       mensagem = "De volta ao foco!";
     }
     const agora = Date.now();
-    this.fim = agora + this.restanteMs;
-    this.ultimo = agora;
+    this.fim = inicio + this.restanteMs;
+    this.ultimo = inicio;
     if (this.onTick) this.onTick(this.formatarTempo());
     if (this.onAlarme) this.onAlarme(mensagem);
   }

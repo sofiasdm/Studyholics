@@ -12,7 +12,63 @@ let saving = false;
 let destination = null;
 
 function disciplina() { return $("disc-nome").value === OUTRA_DISCIPLINA ? $("disc-outra").value.trim() : $("disc-nome").value; }
-function show(screen) { Object.entries(tela).forEach(([key, node]) => { node.style.display = key === screen ? "block" : "none"; }); }
+
+// [N1: Controle de tela atual e persistência em localStorage]
+let telaAtual = "config";
+function show(screen) {
+  telaAtual = screen;
+  Object.entries(tela).forEach(([key, node]) => { node.style.display = key === screen ? "block" : "none"; });
+  if (screen === "conclusao") limparEstado();
+  else salvarEstado();
+}
+
+const CHAVE_ESTADO = "studyholics.pomodoro.v1";
+const CHAVE_TUTORIAL = "studyholics.pomodoro.tutorial.v1";
+const IDS_TEMPOS = ["input-foco", "input-pausa-curta", "input-pausa-longa", "input-intervalo"];
+let usuarioId = null;
+
+function limparEstado() { try { localStorage.removeItem(CHAVE_ESTADO); } catch { /* sem armazenamento */ } }
+function salvarEstado() {
+  if (!usuarioId || telaAtual === "conclusao") return;
+  try {
+    localStorage.setItem(CHAVE_ESTADO, JSON.stringify({
+      v: 1, usuario: usuarioId, tela: telaAtual, sessionId,
+      disc: $("disc-nome").value, outra: $("disc-outra").value, conteudo: $("disc-conteudo").value,
+      resumo: $("texto-resumo").value, tempos: IDS_TEMPOS.map(id => $(id).value),
+      timer: sessionId ? clock.exportar() : null,
+    }));
+  } catch { /* ignora */ }
+}
+function restaurarEstado() {
+  let e = null;
+  try { e = JSON.parse(localStorage.getItem(CHAVE_ESTADO)); } catch { /* ignora */ }
+  if (!e || e.v !== 1 || e.usuario !== usuarioId) return;
+
+  IDS_TEMPOS.forEach((id, i) => { const n = String(e.tempos?.[i] ?? "").replace(/\D/g, ""); if (n) $(id).value = n; });
+  $("input-foco").dispatchEvent(new Event("input"));
+  if (!new URLSearchParams(location.search).get("disciplina") && [...$("disc-nome").options].some(o => o.value === e.disc)) {
+    $("disc-nome").value = e.disc;
+    $("disc-nome").dispatchEvent(new Event("change"));
+  }
+  $("disc-outra").value = String(e.outra ?? "").slice(0, 100);
+  $("disc-conteudo").value = String(e.conteudo ?? "").slice(0, 200);
+  $("texto-resumo").value = String(e.resumo ?? "");
+
+  if (e.sessionId && e.timer && (e.tela === "andamento" || e.tela === "resumo")) {
+    sessionId = e.sessionId;
+    clock.restaurar(e.timer);
+    currentDescription();
+    $("contador-sessao").textContent = `Sessão: ${clock.ciclosCompletos + 1}`;
+    $("btn-pausar-continuar").innerHTML = clock.rodando
+      ? '<i class="fa-solid fa-pause"></i> Pausar' : '<i class="fa-solid fa-play"></i> Continuar';
+    show(e.tela);
+    showNotice("Sessão retomada de onde você parou.", "info");
+  }
+}
+setInterval(salvarEstado, 2000);
+window.addEventListener("pagehide", salvarEstado);
+document.addEventListener("visibilitychange", () => { if (document.hidden) salvarEstado(); });
+
 function showNotice(message, kind = "error") { const box = $("pomodoro-aviso"); box.textContent = message; box.dataset.kind = kind; box.hidden = !message; }
 function config() {
   const names = { foco: "input-foco", pausaCurta: "input-pausa-curta", pausaLonga: "input-pausa-longa", intervalosPausaLonga: "input-intervalo" };
@@ -45,7 +101,7 @@ function currentDescription() {
   $("disc-conteudo-ativo").textContent = $("disc-conteudo").value.trim() || "Sem conteúdo informado";
 }
 
-// Campos de tempo: só dígitos, no máximo 2, valor máximo 240
+// Campos de tempo: só dígitos, no máximo 2
 document.querySelectorAll(".config-tempos input").forEach(input => {
   input.addEventListener("input", () => {
     input.value = input.value.replace(/\D/g, "").slice(0, 2);
@@ -106,13 +162,27 @@ document.querySelectorAll(".nav-link").forEach(link => link.addEventListener("cl
   event.preventDefault(); destination = link.textContent.trim() === "Sair" ? "SIGN_OUT" : link.href;
   $("modal-aviso-saida").style.display = "flex";
 }));
-window.addEventListener("beforeunload", event => { if (sessionId && !saving) event.preventDefault(); });
 
+// [N1: Tutorial — abre sozinho só na 1ª visita]
+function abrirTutorial() { $("modal-tutorial").style.display = "flex"; $("btn-fechar-tutorial").focus(); }
+function fecharTutorial() {
+  $("modal-tutorial").style.display = "none";
+  try { localStorage.setItem(CHAVE_TUTORIAL, "1"); } catch { /* ignora */ }
+}
+$("btn-ajuda-pomodoro").addEventListener("click", abrirTutorial);
+$("btn-fechar-tutorial").addEventListener("click", fecharTutorial);
+document.addEventListener("keydown", e => { if (e.key === "Escape" && $("modal-tutorial").style.display === "flex") fecharTutorial(); });
+
+// [N1: init() atualizado com restauração de estado e abertura do tutorial]
 async function init() {
-  if (!(await exigirLogin())) return;
+  const sessao = await exigirLogin();
+  if (!sessao) return;
+  usuarioId = sessao.user.id;
+
   const options = new Set(DISCIPLINAS);
   const { data, error } = await supabase.rpc("grupo_listar");
   if (!error) data.forEach(g => (g.disciplinas || []).forEach(s => options.add(s)));
+
   $("disc-nome").replaceChildren(new Option("Selecione a disciplina", ""),
     ...[...options].sort((a, b) => a.localeCompare(b, "pt-BR")).map(s => new Option(s, s)),
     new Option("Outra (Personalizada)", OUTRA_DISCIPLINA));
@@ -121,5 +191,14 @@ async function init() {
     $("disc-outra").hidden = !outra;
     if (outra) $("disc-outra").focus(); else $("disc-outra").value = "";
   });
+
+  const preselected = new URLSearchParams(location.search).get("disciplina");
+  if (preselected && options.has(preselected)) $("disc-nome").value = preselected;
+  if (error) showNotice("Não foi possível carregar as disciplinas dos grupos. As disciplinas padrão continuam disponíveis.", "info");
+
+  restaurarEstado();
+  let jaViu = false;
+  try { jaViu = localStorage.getItem(CHAVE_TUTORIAL) === "1"; } catch { /* ignora */ }
+  if (!jaViu) abrirTutorial();
 }
 init();
