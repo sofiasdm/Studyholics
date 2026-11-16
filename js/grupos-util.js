@@ -8,9 +8,9 @@
 // (injeção de dependência): na página é o rpc() real de grupos.js; nos testes, um falso.
 
 export const LIMITES_GRUPO = {
-  nomeMin: 3, nomeMax: 100,
-  descricaoMax: 500,
-  senhaMin: 6, senhaMax: 80,
+  nomeMin: 3, nomeMax: 50,
+  descricaoMax: 300,
+  senhaMin: 8, senhaMax: 8,
   disciplinaMax: 100,
 };
 
