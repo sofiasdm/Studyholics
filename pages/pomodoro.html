@@ -22,7 +22,6 @@
                     <img src="../assets/imagens/studyholics-mark.png" alt="logo">
                 </div>
                 <h1 class="text-xl font-bold tracking-wide">Study<span class="text-mint">holics</span></h1>
-
             </div>
             <!-- Adicionada a classe 'nav-link' para a trava de segurança -->
             <nav class="mt-6 flex flex-col gap-2 px-4">
@@ -43,7 +42,7 @@
         <header class="w-full px-8 py-5 flex items-center justify-between sticky top-0 bg-[#f8fafc]/90 backdrop-blur-md z-10">
             <div class="relative w-full max-w-md">
                 <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input type="text" placeholder="Buscar..." maxlength="60" aria-label="Buscar" class="w-full bg-gray-200/60 border-none rounded-full py-2.5 pl-12 pr-4 text-sm outline-none font-medium">
+                <input type="text" placeholder="Buscar..." class="w-full bg-gray-200/60 border-none rounded-full py-2.5 pl-12 pr-4 text-sm outline-none font-medium">
             </div>
             <div class="flex items-center gap-5 ml-4">
                 <button class="text-darkBlue relative"><i class="fas fa-bell text-xl"></i><span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></span></button>
@@ -53,11 +52,15 @@
 
         <main class="main-area"><p id="pomodoro-aviso" role="status" class="pomodoro-aviso" hidden></p>
             <div class="pomodoro-content">
+
                 <!-- ================= TELA 1: CONFIGURAÇÃO ================= -->
                 <div id="tela-configuracao">
                     <h2 class="titulo">Nova sessão</h2>
                     <p class="subtitulo">Defina o que você vai estudar e por quanto tempo.</p>
-                    <button id="btn-ajuda-pomodoro" type="button" class="btn-texto" style="margin:0 0 0 6px;">Como funciona?</button>
+
+                    <div style="margin-bottom: 10px;">
+                        <a href="#" id="btn-como-funciona" style="font-size: 13px; font-weight: 800; color: #0b1f44; text-decoration: underline;">Como funciona?</a>
+                    </div>
 
                     <div class="cards-disciplina">
                         <div class="card-falso">
@@ -65,34 +68,53 @@
                             <div class="textos">
                                 <label>Disciplina</label>
                                 <select id="disc-nome" aria-label="Disciplina"></select>
-                                <input id="disc-outra" maxlength="60" placeholder="Digite o nome da disciplina" aria-label="Nome da disciplina" hidden>
+                                <input id="disc-outra" maxlength="100" placeholder="Digite o nome da disciplina" hidden>
                             </div>
                         </div>
                         <div class="card-falso">
                             <div class="icone-verde"><i class="fa-solid fa-book-open"></i></div>
                             <div class="textos">
                                 <label>Conteúdo</label>
-                                <input id="disc-conteudo" maxlength="100" placeholder="O que você vai estudar?">
+                                <input id="disc-conteudo" maxlength="200" placeholder="O que você vai estudar?">
                             </div>
                         </div>
                     </div>
 
                     <div class="config-tempos">
                         <div class="input-box">
-                            <label>Pomodoro</label>   <!--Limitador de tamanho do pomodoro-->
+                            <label>
+                                Pomodoro
+                                <span class="tooltip-dica" data-tooltip="Duração em minutos de cada bloco de foco total.">?</span>
+                            </label>
                             <div class="input-box-inner"><input type="number" id="input-foco" value="25" min="1" max="60" maxlength="2"></div>
                         </div>
                         <div class="input-box">
-                            <label>Pausa curta</label>
+                            <label>
+                                Pausa curta
+                                <span class="tooltip-dica" data-tooltip="Descanso rápido em minutos após cada bloco de foco.">?</span>
+                            </label>
                             <div class="input-box-inner"><input type="number" id="input-pausa-curta" value="5" min="1" max="60" maxlength="2"></div>
                         </div>
                         <div class="input-box">
-                            <label>Pausa longa</label>
+                            <label>
+                                Pausa longa
+                                <span class="tooltip-dica" data-tooltip="Descanso maior após completar uma sequência de ciclos.">?</span>
+                            </label>
                             <div class="input-box-inner"><input type="number" id="input-pausa-longa" value="10" min="1" max="60" maxlength="2"></div>
                         </div>
                         <div class="input-box">
-                            <label>Intervalo de pausa longa</label>
+                            <label>
+                                Intervalo de pausa longa
+                                <span class="tooltip-dica" data-tooltip="Quantidade de pomodoros concluídos para liberar uma pausa longa.">?</span>
+                            </label>
                             <div class="input-box-inner"><input type="number" id="input-intervalo" value="4" min="1" max="10" maxlength="2"></div>
+                        </div>
+                        <div class="input-box">
+                            <label>
+                                Sessões
+                                <span class="tooltip-dica" data-tooltip="Total de blocos de foco que você vai realizar antes de encerrar.">?</span>
+                            </label>
+                            <div class="input-box-inner"><input type="number" id="input-sessoes" value="4" min="1" max="20" maxlength="2"></div>
                         </div>
                     </div>
 
@@ -191,24 +213,7 @@
 
             </div>
 
-            <!-- MODAL DE AJUDA: TUTORIAL POMODORO -->
-            <div id="modal-tutorial" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="tutorial-titulo">
-                <div class="modal-content tutorial">
-                    <h3 id="tutorial-titulo"><i class="fa-solid fa-lightbulb"></i> Como usar o Pomodoro</h3>
-                    <ol class="tutorial-passos">
-                        <li><strong>Escolha</strong> a disciplina e escreva o conteúdo que vai estudar.</li>
-                        <li><strong>Ajuste os tempos</strong>: o padrão é 25 min de foco e 5 min de pausa. A cada 4 pomodoros vem uma pausa longa.</li>
-                        <li>Clique em <strong>Começar</strong>. O cronômetro troca sozinho entre foco e pausa. Use <strong>Pausar</strong> para parar.</li>
-                        <li>Ao terminar, clique em <strong>Finalizar sessão</strong>, escreva um resumo (opcional) e <strong>salve</strong> para ganhar pontos.</li>
-                        <li>Se recarregar a página, a sessão <strong>continua de onde parou</strong>.</li>
-                  </ol>
-                  <button id="btn-fechar-tutorial" class="btn-verde" type="button">Entendi, vamos estudar!</button>
-                </div>
-            </div>
-            
-
             <!-- MODAL DE AVISO: PROTEÇÃO DE SAÍDA -->
-
             <div id="modal-aviso-saida" class="modal-overlay" style="display: none;">
                 <div class="modal-content">
                     <h3><i class="fa-solid fa-triangle-exclamation"></i> Atenção!</h3>

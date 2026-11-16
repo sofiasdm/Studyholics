@@ -6,7 +6,16 @@ import { DISCIPLINAS, OUTRA_DISCIPLINA } from "./disciplinas.js";
 
 const $ = id => document.getElementById(id);
 const tela = { config: $("tela-configuracao"), andamento: $("tela-andamento"), resumo: $("tela-resumo"), conclusao: $("tela-conclusao") };
-const clock = new PomodoroTimer(value => { $("timer-display-ativo").textContent = value; }, message => showNotice(message, "info"), count => { $("contador-sessao").textContent = `Sessão: ${count}`; });
+
+const clock = new PomodoroTimer(
+  value => { $("timer-display-ativo").textContent = value; }, 
+  message => showNotice(message, "info"), 
+  count => { $("contador-sessao").textContent = `Sessão: ${count} de ${clock.config.totalSessoes}`; },
+() => {
+  showNotice("Todas as sessões planejadas foram concluídas! Parabéns!", "info");
+  show("resumo");
+});
+
 let sessionId = null;
 let saving = false;
 let destination = null;
@@ -71,10 +80,10 @@ document.addEventListener("visibilitychange", () => { if (document.hidden) salva
 
 function showNotice(message, kind = "error") { const box = $("pomodoro-aviso"); box.textContent = message; box.dataset.kind = kind; box.hidden = !message; }
 function config() {
-  const names = { foco: "input-foco", pausaCurta: "input-pausa-curta", pausaLonga: "input-pausa-longa", intervalosPausaLonga: "input-intervalo" };
+  const names = { foco: "input-foco", pausaCurta: "input-pausa-curta", pausaLonga: "input-pausa-longa", intervalosPausaLonga: "input-intervalo", totalSessoes: "input-sessoes" };
   const result = Object.fromEntries(Object.entries(names).map(([key, id]) => [key, Number($(id).value)]));
   const invalido = Object.entries(names).some(([key, id]) => !Number.isInteger(result[key]) || result[key] < 1 || result[key] > Number($(id).max));
-  if (invalido) throw new Error("Informe valores inteiros dentro dos limites de cada campo (foco e pausas até 60, intervalo até 10).");
+  if (invalido) throw new Error("Informe valores inteiros dentro dos limites de cada campo (foco e pausas até 60, intervalo até 10, sessões até 20).");
   return result;
 }
 function toggleRunning() {
@@ -117,7 +126,7 @@ $("btn-iniciar-sessao").addEventListener("click", async () => {
     if (!disciplina()) throw new Error($("disc-nome").value === OUTRA_DISCIPLINA ? "Digite o nome da disciplina." : "Escolha uma disciplina.");
     const values = config();
     sessionId = await iniciarSessao(disciplina(), $("disc-conteudo").value.trim(), values.foco);
-    clock.resetar(); clock.configurar(values); currentDescription(); clock.iniciar();
+    clock.resetar(); clock.configurar(values); $("contador-sessao").textContent = `Sessão: 1 de ${values.totalSessoes}`; currentDescription(); clock.iniciar();
     $("btn-pausar-continuar").innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
     show("andamento");
   } catch (e) { showNotice(e.message); }

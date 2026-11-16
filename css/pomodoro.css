@@ -54,20 +54,34 @@ main.main-area {
     font-size: 16px;
 }
 
-.card-falso .textos label { display: block; font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700; }
+.card-falso .textos { flex: 1; }
+.card-falso .textos label { display: block; font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
 .card-falso .textos strong { font-size: 16px; color: #0b1f44; font-weight: 800; }
 
 /* --- INPUTS DE TEMPO (DARK BLUE) --- */
 .config-tempos {
-    display: flex; gap: 20px; margin-bottom: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-bottom: 50px;
 }
 
 .input-box {
-    display: flex; flex-direction: column;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 120px;
 }
 
 .input-box label {
-    font-size: 13px; font-weight: 800; margin-bottom: 8px; color: #0b1f44;
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: #0b1f44;
+    text-align: center;
+    line-height: 1.2;
 }
 
 .input-box-inner {
@@ -75,7 +89,7 @@ main.main-area {
     border-radius: 8px;
     display: flex;
     align-items: center;
-    padding: 0 10px;
+    justify-content: center;
     height: 55px;
     width: 120px;
 }
@@ -89,7 +103,10 @@ main.main-area {
     outline: none;
     width: 100%;
     text-align: center;
+    padding-left: 14px;
+    color-scheme: white; /* Faz o navegador desenhar as setas nativas na cor branca */
 }
+
 
 /* --- RELÓGIO E ÁREA CENTRAL --- */
 .area-relogio {
@@ -190,3 +207,55 @@ main.main-area {
 .tutorial-passos { margin: 0 0 22px; padding-left: 22px; color: #334155; font-size: 14px; line-height: 1.5; }
 .tutorial-passos li { margin-bottom: 10px; }
 .modal-content.tutorial .btn-verde { display: flex; margin: 0 auto; }
+
+/* --- TOOLTIP DE AJUDA NOS TEMPOS --- */
+.tooltip-dica {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    background-color: #cbd5e1;
+    color: #0b1f44;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 900;
+    margin-left: 4px;
+    cursor: help;
+    position: relative;
+    vertical-align: middle;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.tooltip-dica:hover {
+    background-color: #44bba4;
+    color: white;
+}
+
+.tooltip-dica::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 145%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #0b1f44;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.3;
+    padding: 8px 10px;
+    border-radius: 8px;
+    width: 185px;
+    text-align: center;
+    box-shadow: 0 6px 16px rgba(11, 31, 68, 0.25);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 50;
+}
+
+.tooltip-dica:hover::after {
+    opacity: 1;
+    visibility: visible;
+}

@@ -3,7 +3,7 @@
 // então não atrasa quando a aba fica em segundo plano. O tempo de FOCO é acumulado
 // em milissegundos (só enquanto está em modo foco e rodando).
 export class PomodoroTimer {
-  constructor(onTick, onAlarme, onMudarSessao) {
+  constructor(onTick, onAlarme, onMudarSessao, onConcluirTudo) {
     this.config = { foco: 25, pausaCurta: 5, pausaLonga: 10, intervalosPausaLonga: 4 };
     this.modo = "foco";          // 'foco', 'pausaCurta' ou 'pausaLonga'
     this.ciclosCompletos = 0;    // pomodoros de foco concluídos
@@ -16,6 +16,7 @@ export class PomodoroTimer {
     this.onTick = onTick;
     this.onAlarme = onAlarme;
     this.onMudarSessao = onMudarSessao;
+    this.onConcluirTudo = onConcluirTudo;
   }
 
   get rodando() { return this.intervalo !== null; }
@@ -132,6 +133,17 @@ export class PomodoroTimer {
     let mensagem;
     if (this.modo === "foco") {
       this.ciclosCompletos++;
+
+      //Verifica se atingiu o número finito de sessões configurado
+      if (this.ciclosCompletos >= this.config.totalSessoes) {
+        clearInterval(this.intervalo);
+        this.intervalo = null;
+        this.restanteMs = 0;
+        if (this.onTick) this.onTick("00:00");
+        if (this.onConcluirTudo) this.onConcluirTudo();
+        return;
+      }
+      
       if (this.onMudarSessao) this.onMudarSessao(this.ciclosCompletos + 1);
       if (this.ciclosCompletos % this.config.intervalosPausaLonga === 0) {
         this.modo = "pausaLonga";
