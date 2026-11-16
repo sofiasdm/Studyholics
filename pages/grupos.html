@@ -107,10 +107,11 @@
           <div class="info-card">
             <h2 id="feed-heading">Feed do grupo</h2>
             <p>Publique dúvidas, resumos e materiais para os membros do grupo.</p>
+            <div id="feed-summary-draft" class="feed-summary-draft" hidden><span>Revise o resumo da sessão antes de publicar.</span><button id="feed-summary-cancel" type="button" class="secondary-button">Cancelar resumo</button></div>
             <form id="feed-form" class="organizer-form feed-form">
               <label for="feed-title">Título <small>(opcional)</small></label>
               <input id="feed-title" name="titulo" maxlength="50" placeholder="Dê um título à publicação">
-              <label for="feed-text">Texto</label>
+              <label for="feed-text">Texto <small id="feed-text-hint" hidden>Resumo da sessão: sem limite de caracteres</small></label>
               <textarea id="feed-text" name="texto" rows="4" maxlength="500" placeholder="O que você quer compartilhar?"></textarea>
               <label for="feed-link">Link <small>(opcional)</small></label>
               <input id="feed-link" name="link" type="url" maxlength="2048" placeholder="https://">
@@ -129,14 +130,6 @@
 
         <div id="tab-membros" class="group-tab-panel" hidden>
           <div class="members-heading"><h2 id="members-heading">Membros</h2></div>
-          <form id="invite-form" class="invite-form" hidden>
-            <label for="invite-email">Adicionar membro pelo e-mail de cadastro</label>
-            <div class="invite-fields">
-              <input id="invite-email" name="email" type="email" maxlength="254" autocomplete="off" required placeholder="pessoa@exemplo.com">
-              <button class="primary-button" type="submit">Adicionar membro</button>
-            </div>
-            <p id="invite-feedback" class="group-form-feedback" role="status"></p>
-          </form>
           <div id="members-list" class="members-list"></div>
         </div>
 
